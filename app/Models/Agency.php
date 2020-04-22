@@ -29,6 +29,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property Collection|Attribution[] $attributions
  * @property Collection|FareAttribute[] $fare_attributes
  * @property Collection|Route[] $routes
+ * @property Collection|User[] $users
  *
  * @package App\Models
  */
@@ -60,5 +61,10 @@ class Agency extends Model
 	public function routes()
 	{
 		return $this->hasMany(Route::class);
+	}
+
+	public function users()
+	{
+		return $this->hasMany(User::class);
 	}
 }
