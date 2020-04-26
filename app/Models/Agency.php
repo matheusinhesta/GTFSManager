@@ -30,6 +30,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property Collection|FareAttribute[] $fare_attributes
  * @property Collection|Route[] $routes
  * @property Collection|User[] $users
+ * @property Collection|VehicleDescriptor[] $vehicle_descriptors
  *
  * @package App\Models
  */
@@ -66,5 +67,10 @@ class Agency extends Model
 	public function users()
 	{
 		return $this->hasMany(User::class);
+	}
+
+	public function vehicle_descriptors()
+	{
+		return $this->hasMany(VehicleDescriptor::class);
 	}
 }

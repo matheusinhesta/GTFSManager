@@ -7,6 +7,7 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -27,6 +28,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * 
  * @property Agency $agency
  * @property UserType $user_type
+ * @property Collection|TripDescriptor[] $trip_descriptors
  *
  * @package App\Models
  */
@@ -67,5 +69,10 @@ class User extends Model
 	public function user_type()
 	{
 		return $this->belongsTo(UserType::class, 'type_id');
+	}
+
+	public function trip_descriptors()
+	{
+		return $this->hasMany(TripDescriptor::class);
 	}
 }
