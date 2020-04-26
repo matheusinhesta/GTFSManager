@@ -24,6 +24,14 @@ class CreateAlertTable extends Migration
             $table->text('description_text');
             $table->timestamps();
             $table->softDeletes();
+
+            $table->foreign('informed_entity')
+                ->references('id')->on('entity_selector')
+                ->onUpdate('cascade')->onDelete('cascade');
+
+            $table->foreign('active_period')
+                ->references('id')->on('time_range')
+                ->onUpdate('cascade')->onDelete('cascade');
         });
     }
 

@@ -27,7 +27,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $deleted_at
  * 
  * @property User $user
+ * @property Collection|EntitySelector[] $entity_selectors
  * @property Collection|TripUpdate[] $trip_updates
+ * @property Collection|VehiclePosition[] $vehicle_positions
  *
  * @package App\Models
  */
@@ -64,8 +66,18 @@ class TripDescriptor extends Model
 		return $this->belongsTo(User::class);
 	}
 
+	public function entity_selectors()
+	{
+		return $this->hasMany(EntitySelector::class);
+	}
+
 	public function trip_updates()
 	{
 		return $this->hasMany(TripUpdate::class);
+	}
+
+	public function vehicle_positions()
+	{
+		return $this->hasMany(VehiclePosition::class);
 	}
 }

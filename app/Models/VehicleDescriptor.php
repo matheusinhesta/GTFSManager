@@ -7,6 +7,7 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -22,6 +23,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $deleted_at
  * 
  * @property Agency $agency
+ * @property Collection|VehiclePosition[] $vehicle_positions
  *
  * @package App\Models
  */
@@ -43,5 +45,10 @@ class VehicleDescriptor extends Model
 	public function agency()
 	{
 		return $this->belongsTo(Agency::class);
+	}
+
+	public function vehicle_positions()
+	{
+		return $this->hasMany(VehiclePosition::class, 'vehicle_id');
 	}
 }

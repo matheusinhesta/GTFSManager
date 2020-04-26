@@ -22,6 +22,22 @@ class CreateEntitySelectorTable extends Migration
             $table->unsignedBigInteger('stop_id')->nullable();
             $table->timestamps();
             $table->softDeletes();
+
+            $table->foreign('agency_id')
+                ->references('id')->on('agency')
+                ->onUpdate('cascade')->onDelete('cascade');
+
+            $table->foreign('route_id')
+                ->references('id')->on('routes')
+                ->onUpdate('cascade')->onDelete('cascade');
+
+            $table->foreign('trip_descriptor_id')
+                ->references('id')->on('trip_descriptor')
+                ->onUpdate('cascade')->onDelete('cascade');
+
+            $table->foreign('stop_id')
+                ->references('id')->on('stops')
+                ->onUpdate('cascade')->onDelete('cascade');
         });
     }
 

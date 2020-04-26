@@ -29,6 +29,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property string $deleted_at
+ * 
+ * @property TripDescriptor $trip_descriptor
+ * @property VehicleDescriptor $vehicle_descriptor
  *
  * @package App\Models
  */
@@ -63,4 +66,14 @@ class VehiclePosition extends Model
 		'congestion_level',
 		'occupancy_status'
 	];
+
+	public function trip_descriptor()
+	{
+		return $this->belongsTo(TripDescriptor::class);
+	}
+
+	public function vehicle_descriptor()
+	{
+		return $this->belongsTo(VehicleDescriptor::class, 'vehicle_id');
+	}
 }

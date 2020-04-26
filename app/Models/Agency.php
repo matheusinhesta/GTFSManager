@@ -27,6 +27,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $deleted_at
  * 
  * @property Collection|Attribution[] $attributions
+ * @property Collection|EntitySelector[] $entity_selectors
  * @property Collection|FareAttribute[] $fare_attributes
  * @property Collection|Route[] $routes
  * @property Collection|User[] $users
@@ -52,6 +53,11 @@ class Agency extends Model
 	public function attributions()
 	{
 		return $this->hasMany(Attribution::class);
+	}
+
+	public function entity_selectors()
+	{
+		return $this->hasMany(EntitySelector::class);
 	}
 
 	public function fare_attributes()

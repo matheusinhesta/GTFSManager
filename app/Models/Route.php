@@ -30,6 +30,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * 
  * @property Agency $agency
  * @property Collection|Attribution[] $attributions
+ * @property Collection|EntitySelector[] $entity_selectors
  * @property Collection|FareRule[] $fare_rules
  * @property Collection|Trip[] $trips
  *
@@ -65,6 +66,11 @@ class Route extends Model
 	public function attributions()
 	{
 		return $this->hasMany(Attribution::class);
+	}
+
+	public function entity_selectors()
+	{
+		return $this->hasMany(EntitySelector::class);
 	}
 
 	public function fare_rules()

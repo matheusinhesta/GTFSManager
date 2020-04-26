@@ -29,6 +29,14 @@ class CreateVehiclePositionTable extends Migration
             $table->enum('occupancy_status', ['EMPTY', '_MANY_SEATS_AVAILABLE_', '_FEW_SEATS_AVAILABLE_', '_STANDING_ROOM_ONLY_', '_CRUSHED_STANDING_ROOM_ONLY_', 'FULL', '_NOT_ACCEPTING_PASSENGERS_'])->nullable();
             $table->timestamps();
             $table->softDeletes();
+
+            $table->foreign('trip_descriptor_id')
+                ->references('id')->on('trip_descriptor')
+                ->onUpdate('cascade')->onDelete('cascade');
+
+            $table->foreign('vehicle_id')
+                ->references('id')->on('vehicle_descriptor')
+                ->onUpdate('cascade')->onDelete('cascade');
         });
     }
 

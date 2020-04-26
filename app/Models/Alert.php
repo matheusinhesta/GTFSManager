@@ -24,6 +24,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property string $deleted_at
+ * 
+ * @property TimeRange $time_range
+ * @property EntitySelector $entity_selector
  *
  * @package App\Models
  */
@@ -46,4 +49,14 @@ class Alert extends Model
 		'header_text',
 		'description_text'
 	];
+
+	public function time_range()
+	{
+		return $this->belongsTo(TimeRange::class, 'active_period');
+	}
+
+	public function entity_selector()
+	{
+		return $this->belongsTo(EntitySelector::class, 'informed_entity');
+	}
 }

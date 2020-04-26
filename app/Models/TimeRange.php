@@ -7,6 +7,7 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -19,6 +20,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property string $deleted_at
+ * 
+ * @property Collection|Alert[] $alerts
  *
  * @package App\Models
  */
@@ -36,4 +39,9 @@ class TimeRange extends Model
 		'start',
 		'end'
 	];
+
+	public function alerts()
+	{
+		return $this->hasMany(Alert::class, 'active_period');
+	}
 }

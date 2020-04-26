@@ -33,6 +33,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $deleted_at
  * 
  * @property Zone $zone
+ * @property Collection|EntitySelector[] $entity_selectors
  * @property Collection|StopTime[] $stop_times
  *
  * @package App\Models
@@ -67,6 +68,11 @@ class Stop extends Model
 	public function zone()
 	{
 		return $this->belongsTo(Zone::class);
+	}
+
+	public function entity_selectors()
+	{
+		return $this->hasMany(EntitySelector::class);
 	}
 
 	public function stop_times()
