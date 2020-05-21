@@ -8,8 +8,11 @@ Route::get('/', function () {
     return response()->json(['message' => 'Entrou na API']);
 });
 
+
+Route::post('register', 'AuthController@register');
 Route::post('login', 'AuthController@login')->name('login');
 
+// Authenticated Routes
 Route::middleware(['jwt.verify'])->group(function () {
     Route::post('logout', 'AuthController@logout');
     Route::post('refresh', 'AuthController@refresh');
