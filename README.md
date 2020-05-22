@@ -24,6 +24,8 @@ After setting, run the commands:
 ```
 composer install
 php artisan migrate --seed
+php artisan key:generate
+php artisan jwt:secret
 ```
 
 This will cause the database to be populated with the necessary information for operation.
