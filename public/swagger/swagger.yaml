@@ -1,114 +1,318 @@
 swagger: "2.0"
 info:
-  description: "This is a sample server Petstore server.  You can find out more about     Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).      For this sample, you can use the api key `special-key` to test the authorization     filters."
+  description: "This API manages routes for public transport agencies. Saving your data in a relational database, converts the information to the GTFS specification, which can be used to search for information from traffic agencies and to monitor in real time any specific itinerary. \n\nImplemented for a graduate work in the Computer Science course. \n\n It is necessary to have configured the SMTP server credentials to notify the user via e-mail with the generated password."
   version: "1.0.0"
-  title: "Swagger Petstore"
-  termsOfService: "http://swagger.io/terms/"
+  title: "GTFS Manager"
   contact:
-    email: "apiteam@swagger.io"
+    email: "matheusinhesta@live.com"
   license:
     name: "Apache 2.0"
     url: "http://www.apache.org/licenses/LICENSE-2.0.html"
-host: "petstore.swagger.io"
-basePath: "/v2"
+basePath: "/api"
 tags:
-- name: "pet"
-  description: "Everything about your Pets"
-  externalDocs:
-    description: "Find out more"
-    url: "http://swagger.io"
-- name: "store"
-  description: "Access to Petstore orders"
-- name: "user"
-  description: "Operations about user"
-  externalDocs:
-    description: "Find out more about our store"
-    url: "http://swagger.io"
-schemes:
-- "https"
-- "http"
+  - name: "Auth"
+    description: "Everything about authentication on API"
+  - name: "store"
+    description: "Access to Petstore orders"
+  - name: "user"
+    description: "Operations about user"
 paths:
-  /pet:
+  /register:
     post:
       tags:
-      - "pet"
-      summary: "Add a new pet to the store"
-      description: ""
-      operationId: "addPet"
+        - "Auth"
+      summary: "Register your Agency and User in API"
+      description: "It is necessary to have configured the SMTP server credentials to notify the user via e-mail with the generated password"
+      operationId: "register"
       consumes:
-      - "application/json"
-      - "application/xml"
+        - "application/x-www-form-urlencoded"
       produces:
-      - "application/xml"
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "body"
-        name: "body"
-        description: "Pet object that needs to be added to the store"
-        required: true
-        schema:
-          $ref: "#/definitions/Pet"
-      responses:
-        "405":
-          description: "Invalid input"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
-    put:
-      tags:
-      - "pet"
-      summary: "Update an existing pet"
-      description: ""
-      operationId: "updatePet"
-      consumes:
-      - "application/json"
-      - "application/xml"
-      produces:
-      - "application/xml"
-      - "application/json"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "Pet object that needs to be added to the store"
-        required: true
-        schema:
-          $ref: "#/definitions/Pet"
+        - name: "email"
+          in: "formData"
+          description: "User e-mail address"
+          required: true
+          type: "string"
+
+        - name: "name"
+          in: "formData"
+          description: "Full username"
+          required: true
+          type: "string"
+
+        - name: "agency_name"
+          in: "formData"
+          description: "Full name of the transit agency"
+          required: true
+          type: "string"
+
+        - name: "agency_url"
+          in: "formData"
+          description: "URL of the transit agency"
+          required: true
+          type: "string"
+
+        - name: "agency_timezone"
+          in: "formData"
+          description: "Timezone where the transit agency is located"
+          required: true
+          type: "string"
+
+        - name: "agency_lang"
+          in: "formData"
+          description: "Primary language used by this transit agency"
+          required: false
+          type: "string"
+
+        - name: "agency_phone"
+          in: "formData"
+          description: "A voice telephone number for the specified agency. This field is a string value that presents the telephone number as typical for the agency's service area. It can and should contain punctuation marks to group the digits of the number. Dialable text (for example, TriMet's '503-238-RIDE') is permitted, but the field must not contain any other descriptive text"
+          required: false
+          type: "string"
+
+        - name: "agency_fare_url"
+          in: "formData"
+          description: "URL of a web page that allows a rider to purchase tickets or other fare instruments for that agency online"
+          required: false
+          type: "string"
+
+        - name: "agency_email"
+          in: "formData"
+          description: "Email address actively monitored by the agency’s customer service department. This email address should be a direct contact point where transit riders can reach a customer service representative at the agency"
+          required: false
+          type: "string"
+
       responses:
         "400":
-          description: "Invalid ID supplied"
+          description: "Invalid inputs."
+        "500":
+          description: "An error has occurred. Check the return message and error logs."
+        "201":
+          description: "Success! An e-mail was sent to the registered address with the user generated password."
+
+  /login:
+    post:
+      tags:
+        - "Auth"
+      summary: "Login user into the API"
+      description: ""
+      operationId: "login"
+      consumes:
+        - "application/x-www-form-urlencoded"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "email"
+          in: "formData"
+          description: "The user e-mail address for login"
+          required: true
+          type: "string"
+        - name: "password"
+          in: "formData"
+          description: "The password for login in clear text"
+          required: true
+          type: "string"
+      responses:
+        "200":
+          description: "Successful operation"
+          headers:
+            access_token:
+              type: "string"
+              description: "JWT token used for any request that needs to be authenticated"
+            token_type:
+              type: "string"
+              description: "Tokens type"
+            expires_in:
+              type: "string"
+              format: "date-time"
+              description: "Time in UTC when token expires"
+        "400":
+          description: "Invalid inputs."
+        "401":
+          description: "Unauthorized. Invalid e-mail/password"
+        "500":
+          description: "The token could not be created"
+
+  /logout:
+    get:
+      tags:
+        - "Auth"
+      summary: "Logs out current logged in user session"
+      description: ""
+      operationId: "logout"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+      responses:
+        "200":
+          description: "Successful operation"
+
+  /forget-password:
+    post:
+      tags:
+        - "Auth"
+      summary: "Send a new password to the user's e-mail"
+      description: "It is necessary to have configured the SMTP server credentials to notify the user via e-mail with the generated a new password"
+      operationId: "forgetPassword"
+      consumes:
+        - "application/x-www-form-urlencoded"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "email"
+          in: "formData"
+          description: "The user e-mail address for login"
+          required: true
+          type: "string"
+
+      responses:
+        "200":
+          description: "Success! An e-mail was sent to the registered address with the user generated a new password."
+        "400":
+          description: "Invalid input."
         "404":
-          description: "Pet not found"
-        "405":
-          description: "Validation exception"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
+          description: "User not found."
+        "500":
+          description: "The token could not be created"
+
+  /change-password:
+    post:
+      tags:
+        - "Auth"
+      summary: "Change the password of the authenticated user"
+      description: ""
+      operationId: "changePassword"
+      consumes:
+        - "application/x-www-form-urlencoded"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+
+        - name: "password"
+          in: "formData"
+          description: "The user password"
+          required: true
+          type: "string"
+
+        - name: "new_password"
+          in: "formData"
+          description: "The new password"
+          required: true
+          type: "string"
+
+        - name: "new_password_confirmation"
+          in: "formData"
+          description: "The new password confirmation"
+          required: true
+          type: "string"
+
+      responses:
+        "200":
+          description: "Success! User password has been changed."
+        "400":
+          description: "Invalid input."
+        "500":
+          description: "The new password could not be updated."
+
+  /refresh:
+    get:
+      tags:
+        - "Auth"
+      summary: "Refresh access token"
+      description: ""
+      operationId: "refresh"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+      responses:
+        "200":
+          description: "Successful operation"
+          headers:
+            access_token:
+              type: "string"
+              description: "JWT token used for any request that needs to be authenticated"
+            token_type:
+              type: "string"
+              description: "Tokens type"
+            expires_in:
+              type: "string"
+              format: "date-time"
+              description: "Time in UTC when token expires"
+
+  /me:
+    get:
+      tags:
+        - "Auth"
+      summary: "Get authenticated user"
+      description: ""
+      operationId: "me"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+      responses:
+        "200":
+          description: "Successful operation"
+          headers:
+            access_token:
+              type: "string"
+              description: "JWT token used for any request that needs to be authenticated"
+            token_type:
+              type: "string"
+              description: "Tokens type"
+            expires_in:
+              type: "string"
+              format: "date-time"
+              description: "Time in UTC when token expires"
+
   /pet/findByStatus:
     get:
       tags:
-      - "pet"
+        - "pet"
       summary: "Finds Pets by status"
       description: "Multiple status values can be provided with comma separated strings"
       operationId: "findPetsByStatus"
       produces:
-      - "application/xml"
-      - "application/json"
+        - "application/xml"
+        - "application/json"
       parameters:
-      - name: "status"
-        in: "query"
-        description: "Status values that need to be considered for filter"
-        required: true
-        type: "array"
-        items:
-          type: "string"
-          enum:
-          - "available"
-          - "pending"
-          - "sold"
-          default: "available"
-        collectionFormat: "multi"
+        - name: "status"
+          in: "query"
+          description: "Status values that need to be considered for filter"
+          required: true
+          type: "array"
+          items:
+            type: "string"
+            enum:
+              - "available"
+              - "pending"
+              - "sold"
+            default: "available"
+          collectionFormat: "multi"
       responses:
         "200":
           description: "successful operation"
@@ -119,28 +323,28 @@ paths:
         "400":
           description: "Invalid status value"
       security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
+        - petstore_auth:
+            - "write:pets"
+            - "read:pets"
   /pet/findByTags:
     get:
       tags:
-      - "pet"
+        - "pet"
       summary: "Finds Pets by tags"
       description: "Muliple tags can be provided with comma separated strings. Use         tag1, tag2, tag3 for testing."
       operationId: "findPetsByTags"
       produces:
-      - "application/xml"
-      - "application/json"
+        - "application/xml"
+        - "application/json"
       parameters:
-      - name: "tags"
-        in: "query"
-        description: "Tags to filter by"
-        required: true
-        type: "array"
-        items:
-          type: "string"
-        collectionFormat: "multi"
+        - name: "tags"
+          in: "query"
+          description: "Tags to filter by"
+          required: true
+          type: "array"
+          items:
+            type: "string"
+          collectionFormat: "multi"
       responses:
         "200":
           description: "successful operation"
@@ -151,27 +355,27 @@ paths:
         "400":
           description: "Invalid tag value"
       security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
+        - petstore_auth:
+            - "write:pets"
+            - "read:pets"
       deprecated: true
   /pet/{petId}:
     get:
       tags:
-      - "pet"
+        - "pet"
       summary: "Find pet by ID"
       description: "Returns a single pet"
       operationId: "getPetById"
       produces:
-      - "application/xml"
-      - "application/json"
+        - "application/xml"
+        - "application/json"
       parameters:
-      - name: "petId"
-        in: "path"
-        description: "ID of pet to return"
-        required: true
-        type: "integer"
-        format: "int64"
+        - name: "petId"
+          in: "path"
+          description: "ID of pet to return"
+          required: true
+          type: "integer"
+          format: "int64"
       responses:
         "200":
           description: "successful operation"
@@ -182,117 +386,117 @@ paths:
         "404":
           description: "Pet not found"
       security:
-      - api_key: []
+        - api_key: []
     post:
       tags:
-      - "pet"
+        - "pet"
       summary: "Updates a pet in the store with form data"
       description: ""
       operationId: "updatePetWithForm"
       consumes:
-      - "application/x-www-form-urlencoded"
+        - "application/x-www-form-urlencoded"
       produces:
-      - "application/xml"
-      - "application/json"
+        - "application/xml"
+        - "application/json"
       parameters:
-      - name: "petId"
-        in: "path"
-        description: "ID of pet that needs to be updated"
-        required: true
-        type: "integer"
-        format: "int64"
-      - name: "name"
-        in: "formData"
-        description: "Updated name of the pet"
-        required: false
-        type: "string"
-      - name: "status"
-        in: "formData"
-        description: "Updated status of the pet"
-        required: false
-        type: "string"
+        - name: "petId"
+          in: "path"
+          description: "ID of pet that needs to be updated"
+          required: true
+          type: "integer"
+          format: "int64"
+        - name: "name"
+          in: "formData"
+          description: "Updated name of the pet"
+          required: false
+          type: "string"
+        - name: "status"
+          in: "formData"
+          description: "Updated status of the pet"
+          required: false
+          type: "string"
       responses:
         "405":
           description: "Invalid input"
       security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
+        - petstore_auth:
+            - "write:pets"
+            - "read:pets"
     delete:
       tags:
-      - "pet"
+        - "pet"
       summary: "Deletes a pet"
       description: ""
       operationId: "deletePet"
       produces:
-      - "application/xml"
-      - "application/json"
+        - "application/xml"
+        - "application/json"
       parameters:
-      - name: "api_key"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "petId"
-        in: "path"
-        description: "Pet id to delete"
-        required: true
-        type: "integer"
-        format: "int64"
+        - name: "api_key"
+          in: "header"
+          required: false
+          type: "string"
+        - name: "petId"
+          in: "path"
+          description: "Pet id to delete"
+          required: true
+          type: "integer"
+          format: "int64"
       responses:
         "400":
           description: "Invalid ID supplied"
         "404":
           description: "Pet not found"
       security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
+        - petstore_auth:
+            - "write:pets"
+            - "read:pets"
   /pet/{petId}/uploadImage:
     post:
       tags:
-      - "pet"
+        - "pet"
       summary: "uploads an image"
       description: ""
       operationId: "uploadFile"
       consumes:
-      - "multipart/form-data"
+        - "multipart/form-data"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - name: "petId"
-        in: "path"
-        description: "ID of pet to update"
-        required: true
-        type: "integer"
-        format: "int64"
-      - name: "additionalMetadata"
-        in: "formData"
-        description: "Additional data to pass to server"
-        required: false
-        type: "string"
-      - name: "file"
-        in: "formData"
-        description: "file to upload"
-        required: false
-        type: "file"
+        - name: "petId"
+          in: "path"
+          description: "ID of pet to update"
+          required: true
+          type: "integer"
+          format: "int64"
+        - name: "additionalMetadata"
+          in: "formData"
+          description: "Additional data to pass to server"
+          required: false
+          type: "string"
+        - name: "file"
+          in: "formData"
+          description: "file to upload"
+          required: false
+          type: "file"
       responses:
         "200":
           description: "successful operation"
           schema:
             $ref: "#/definitions/ApiResponse"
       security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
+        - petstore_auth:
+            - "write:pets"
+            - "read:pets"
   /store/inventory:
     get:
       tags:
-      - "store"
+        - "store"
       summary: "Returns pet inventories by status"
       description: "Returns a map of status codes to quantities"
       operationId: "getInventory"
       produces:
-      - "application/json"
+        - "application/json"
       parameters: []
       responses:
         "200":
@@ -303,24 +507,24 @@ paths:
               type: "integer"
               format: "int32"
       security:
-      - api_key: []
+        - api_key: []
   /store/order:
     post:
       tags:
-      - "store"
+        - "store"
       summary: "Place an order for a pet"
       description: ""
       operationId: "placeOrder"
       produces:
-      - "application/xml"
-      - "application/json"
+        - "application/xml"
+        - "application/json"
       parameters:
-      - in: "body"
-        name: "body"
-        description: "order placed for purchasing the pet"
-        required: true
-        schema:
-          $ref: "#/definitions/Order"
+        - in: "body"
+          name: "body"
+          description: "order placed for purchasing the pet"
+          required: true
+          schema:
+            $ref: "#/definitions/Order"
       responses:
         "200":
           description: "successful operation"
@@ -331,22 +535,22 @@ paths:
   /store/order/{orderId}:
     get:
       tags:
-      - "store"
+        - "store"
       summary: "Find purchase order by ID"
       description: "For valid response try integer IDs with value >= 1 and <= 10.         Other values will generated exceptions"
       operationId: "getOrderById"
       produces:
-      - "application/xml"
-      - "application/json"
+        - "application/xml"
+        - "application/json"
       parameters:
-      - name: "orderId"
-        in: "path"
-        description: "ID of pet that needs to be fetched"
-        required: true
-        type: "integer"
-        maximum: 10.0
-        minimum: 1.0
-        format: "int64"
+        - name: "orderId"
+          in: "path"
+          description: "ID of pet that needs to be fetched"
+          required: true
+          type: "integer"
+          maximum: 10.0
+          minimum: 1.0
+          format: "int64"
       responses:
         "200":
           description: "successful operation"
@@ -358,21 +562,21 @@ paths:
           description: "Order not found"
     delete:
       tags:
-      - "store"
+        - "store"
       summary: "Delete purchase order by ID"
       description: "For valid response try integer IDs with positive integer value.         Negative or non-integer values will generate API errors"
       operationId: "deleteOrder"
       produces:
-      - "application/xml"
-      - "application/json"
+        - "application/xml"
+        - "application/json"
       parameters:
-      - name: "orderId"
-        in: "path"
-        description: "ID of the order that needs to be deleted"
-        required: true
-        type: "integer"
-        minimum: 1.0
-        format: "int64"
+        - name: "orderId"
+          in: "path"
+          description: "ID of the order that needs to be deleted"
+          required: true
+          type: "integer"
+          minimum: 1.0
+          format: "int64"
       responses:
         "400":
           description: "Invalid ID supplied"
@@ -381,88 +585,88 @@ paths:
   /user:
     post:
       tags:
-      - "user"
+        - "user"
       summary: "Create user"
       description: "This can only be done by the logged in user."
       operationId: "createUser"
       produces:
-      - "application/xml"
-      - "application/json"
+        - "application/xml"
+        - "application/json"
       parameters:
-      - in: "body"
-        name: "body"
-        description: "Created user object"
-        required: true
-        schema:
-          $ref: "#/definitions/User"
+        - in: "body"
+          name: "body"
+          description: "Created user object"
+          required: true
+          schema:
+            $ref: "#/definitions/User"
       responses:
         default:
           description: "successful operation"
   /user/createWithArray:
     post:
       tags:
-      - "user"
+        - "user"
       summary: "Creates list of users with given input array"
       description: ""
       operationId: "createUsersWithArrayInput"
       produces:
-      - "application/xml"
-      - "application/json"
+        - "application/xml"
+        - "application/json"
       parameters:
-      - in: "body"
-        name: "body"
-        description: "List of user object"
-        required: true
-        schema:
-          type: "array"
-          items:
-            $ref: "#/definitions/User"
+        - in: "body"
+          name: "body"
+          description: "List of user object"
+          required: true
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/User"
       responses:
         default:
           description: "successful operation"
   /user/createWithList:
     post:
       tags:
-      - "user"
+        - "user"
       summary: "Creates list of users with given input array"
       description: ""
       operationId: "createUsersWithListInput"
       produces:
-      - "application/xml"
-      - "application/json"
+        - "application/xml"
+        - "application/json"
       parameters:
-      - in: "body"
-        name: "body"
-        description: "List of user object"
-        required: true
-        schema:
-          type: "array"
-          items:
-            $ref: "#/definitions/User"
+        - in: "body"
+          name: "body"
+          description: "List of user object"
+          required: true
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/User"
       responses:
         default:
           description: "successful operation"
   /user/login:
     get:
       tags:
-      - "user"
+        - "user"
       summary: "Logs user into the system"
       description: ""
       operationId: "loginUser"
       produces:
-      - "application/xml"
-      - "application/json"
+        - "application/xml"
+        - "application/json"
       parameters:
-      - name: "username"
-        in: "query"
-        description: "The user name for login"
-        required: true
-        type: "string"
-      - name: "password"
-        in: "query"
-        description: "The password for login in clear text"
-        required: true
-        type: "string"
+        - name: "username"
+          in: "query"
+          description: "The user name for login"
+          required: true
+          type: "string"
+        - name: "password"
+          in: "query"
+          description: "The password for login in clear text"
+          required: true
+          type: "string"
       responses:
         "200":
           description: "successful operation"
@@ -479,36 +683,23 @@ paths:
               description: "date in UTC when token expires"
         "400":
           description: "Invalid username/password supplied"
-  /user/logout:
-    get:
-      tags:
-      - "user"
-      summary: "Logs out current logged in user session"
-      description: ""
-      operationId: "logoutUser"
-      produces:
-      - "application/xml"
-      - "application/json"
-      parameters: []
-      responses:
-        default:
-          description: "successful operation"
+
   /user/{username}:
     get:
       tags:
-      - "user"
+        - "user"
       summary: "Get user by user name"
       description: ""
       operationId: "getUserByName"
       produces:
-      - "application/xml"
-      - "application/json"
+        - "application/xml"
+        - "application/json"
       parameters:
-      - name: "username"
-        in: "path"
-        description: "The name that needs to be fetched. Use user1 for testing. "
-        required: true
-        type: "string"
+        - name: "username"
+          in: "path"
+          description: "The name that needs to be fetched. Use user1 for testing. "
+          required: true
+          type: "string"
       responses:
         "200":
           description: "successful operation"
@@ -520,25 +711,25 @@ paths:
           description: "User not found"
     put:
       tags:
-      - "user"
+        - "user"
       summary: "Updated user"
       description: "This can only be done by the logged in user."
       operationId: "updateUser"
       produces:
-      - "application/xml"
-      - "application/json"
+        - "application/xml"
+        - "application/json"
       parameters:
-      - name: "username"
-        in: "path"
-        description: "name that need to be updated"
-        required: true
-        type: "string"
-      - in: "body"
-        name: "body"
-        description: "Updated user object"
-        required: true
-        schema:
-          $ref: "#/definitions/User"
+        - name: "username"
+          in: "path"
+          description: "name that need to be updated"
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "Updated user object"
+          required: true
+          schema:
+            $ref: "#/definitions/User"
       responses:
         "400":
           description: "Invalid user supplied"
@@ -546,19 +737,19 @@ paths:
           description: "User not found"
     delete:
       tags:
-      - "user"
+        - "user"
       summary: "Delete user"
       description: "This can only be done by the logged in user."
       operationId: "deleteUser"
       produces:
-      - "application/xml"
-      - "application/json"
+        - "application/xml"
+        - "application/json"
       parameters:
-      - name: "username"
-        in: "path"
-        description: "The name that needs to be deleted"
-        required: true
-        type: "string"
+        - name: "username"
+          in: "path"
+          description: "The name that needs to be deleted"
+          required: true
+          type: "string"
       responses:
         "400":
           description: "Invalid username supplied"
@@ -596,9 +787,9 @@ definitions:
         type: "string"
         description: "Order Status"
         enum:
-        - "placed"
-        - "approved"
-        - "delivered"
+          - "placed"
+          - "approved"
+          - "delivered"
       complete:
         type: "boolean"
         default: false
@@ -651,8 +842,8 @@ definitions:
   Pet:
     type: "object"
     required:
-    - "name"
-    - "photoUrls"
+      - "name"
+      - "photoUrls"
     properties:
       id:
         type: "integer"
@@ -680,9 +871,9 @@ definitions:
         type: "string"
         description: "pet status in the store"
         enum:
-        - "available"
-        - "pending"
-        - "sold"
+          - "available"
+          - "pending"
+          - "sold"
     xml:
       name: "Pet"
   ApiResponse:

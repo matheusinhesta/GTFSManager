@@ -19,12 +19,12 @@ class AgencyTableSeeder extends Seeder
             'email'    => 'matheusinhesta@live.com'
         ]);
 
-        \App\Models\Agency::create([
-            'name'     => 'Moreira Transportes',
-            'url'      => 'https://www.google.com',
-            'timezone' => 'BRT',
-            'lang'     => 'pt-BR',
-            'email'    => 'matheus.inhesta@sga.pucminas.br'
-        ]);
+//        \App\Models\Agency::create([
+//            'name'     => 'Moreira Transportes',
+//            'url'      => 'https://www.google.com',
+//            'timezone' => 'BRT',
+//            'lang'     => 'pt-BR',
+//            'email'    => 'matheus.inhesta@sga.pucminas.br'
+//        ]);
     }
 }

@@ -14,5 +14,3 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::view('/', 'documentation.index-swagger');
-
-Route::view('/email', 'emails.welcome');
