@@ -53,7 +53,7 @@ MAIL_FROM_NAME="${APP_NAME}"
 
 ## Documentation
 
-All documentation was made using the Swagger Editor library, being made available on the system's root route.
+All documentation was made using the [Swagger Editor](http://editor.swagger.io) library, being made available on the system's root route.
 
 After starting the system with the command:
 ```
