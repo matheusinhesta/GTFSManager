@@ -4,11 +4,15 @@ This API manages routes for public transport agencies. Saving your data in a rel
 
 Implemented for a graduate work in the Computer Science course.
 
-It is necessary to have configured the SMTP server credentials to notify the user via e-mail with the generated password.
+**It is necessary to have configured the SMTP server credentials to notify the user via e-mail with the generated password.**
+
+ - For testing, I used [Mailtrap.io](https://mailtrap.io/)
 
 ## Installation
 
-When cloning the repository, you must edit the .env file with the database credentials.
+When cloning the repository, you must edit the **.env** file with the database credentials.
+
+Copy the **.env.example** file to the project's root folder with the name **.env**
 
 ```
 DB_CONNECTION=mysql
@@ -30,9 +34,11 @@ php artisan jwt:secret
 
 This will cause the database to be populated with the necessary information for operation.
 
-## SMPT Configuration
+## SMTP Configuration
 
 It is necessary to update the .env file with the SMTP server information for the system to notify the user with their passwords.
+
+- For testing, I used [Mailtrap.io](https://mailtrap.io/)
 
 ```
 MAIL_MAILER=smtp
