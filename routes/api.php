@@ -20,13 +20,15 @@ Route::middleware(['jwt.verify'])->group(function () {
     Route::get('me', 'AuthController@getAuthenticatedUser');
     Route::post('change-password', 'AuthController@changePassword');
 
+    // User agency informations
+    Route::get('agency', 'AgencyController@index');
+
     // Only admins
     Route::middleware(['permissions.verify'])->group(function () {
 
-        Route::prefix('agency')->group(function(){
-            Route::get('', 'AgencyController@index');
-            Route::post('', 'AgencyController@update');
-        });
+        // Edit agency informations
+        Route::post('agency', 'AgencyController@update');
+
 
         Route::resource('users', 'UserController');
 

@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class Agency
- * 
+ *
  * @property int $id
  * @property string $name
  * @property string $url
@@ -25,7 +25,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property string $deleted_at
- * 
+ *
  * @property Collection|Attribution[] $attributions
  * @property Collection|EntitySelector[] $entity_selectors
  * @property Collection|FareAttribute[] $fare_attributes
@@ -79,4 +79,12 @@ class Agency extends Model
 	{
 		return $this->hasMany(VehicleDescriptor::class);
 	}
+
+    public function getCreatedAtAttribute($value) {
+        return Carbon::createFromTimestamp(strtotime($value))->timezone(config('app.timezone'))->toDateTimeString();
+    }
+
+    public function getUpdatedAtAttribute($value) {
+        return Carbon::createFromTimestamp(strtotime($value))->timezone(config('app.timezone'))->toDateTimeString();
+    }
 }

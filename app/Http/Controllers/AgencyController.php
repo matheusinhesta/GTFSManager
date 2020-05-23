@@ -9,6 +9,7 @@ class AgencyController extends Controller {
 
     public function index(){
         $agency = \Auth::user()->agency()->get(['id', 'name', 'timezone', 'lang', 'fare_url', 'phone', 'email', 'created_at', 'updated_at']);
+
         return response()->json(compact('agency'), 200);
     }
 

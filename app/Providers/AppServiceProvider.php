@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 
@@ -12,11 +13,10 @@ class AppServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register()
-    {
+    public function register() {
         Schema::defaultStringLength(191);
         date_default_timezone_set('America/Sao_Paulo');
-        \Carbon\Carbon::setLocale('pt_BR');
+        Carbon::setLocale('pt_BR');
 
         if ($this->app->environment() == 'local') {
             $this->app->register(\Reliese\Coders\CodersServiceProvider::class);
@@ -28,8 +28,7 @@ class AppServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
-    {
-        //
+    public function boot() {
+
     }
 }

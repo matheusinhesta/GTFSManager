@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Notifications\WelcomeNotification;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -21,7 +22,9 @@ class UserController extends Controller {
                             $q->select(['id', 'description']);
                         }])->where('agency_id', \Auth::user()->agency_id)
                            ->get(['id', 'type_id', 'name', 'email', 'created_at', 'updated_at']);
-        return response()->json(compact('users'), 200);
+
+
+        return response()->json(['users' => $users], 200);
     }
 
 
@@ -93,14 +96,11 @@ class UserController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id){
-        if(\Auth::user()->id == $id)
-            $request->except(['type_id']);
-
         $user = User::where('agency_id', \Auth::user()->agency_id)->findOrFail($id);
 
         $validator = Validator::make($request->all(), [
             'name'     => 'string|min:10|max:255',
-            'email'    => 'string|email|max:255|unique:users,email,'.$id,
+            'email'    => 'string|email|max:255|unique:users,email,'.$id.',id,deleted_at,NULL',
             'type_id'  => 'integer|exists:user_types,id',
             'password' => 'string|min:10|max:255|confirmed'
         ]);
@@ -111,18 +111,13 @@ class UserController extends Controller {
         DB::beginTransaction();
 
         try {
-            dd($request->input());
             $user->update(array_merge($request->all(), [
-                'password'  => ($request->has('password') ? Hash::make($request->password) : $user->password)
+                'type_id'  => (\Auth::user()->id == $id ? \Auth::user()->type_id : $request->type_id),
+                'password' => ($request->has('password') ? Hash::make($request->password) : $user->password)
             ]));
 
             if($request->has('password')){
-                try {
-                    $user->notify(new WelcomeNotification($request->password, $user));
-                } catch (\Exception $e){
-                    DB::rollback();
-                    return response()->json(['message' => 'Could not notify User. Try again.'], 500);
-                }
+                $user->notify(new WelcomeNotification($request->password, $user));
 
                 DB::commit();
 
@@ -130,8 +125,9 @@ class UserController extends Controller {
             }
 
         } catch (\Exception $e){
+            dd($e->getMessage());
             DB::rollback();
-            return response()->json(['message' => 'Could not create User. Try again.'], 500);
+            return response()->json(['message' => 'Could not update User. Try again.'], 500);
         }
 
         DB::commit();

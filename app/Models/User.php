@@ -80,6 +80,14 @@ class User extends Authenticatable implements JWTSubject {
 		return $this->hasMany(TripDescriptor::class);
 	}
 
+    public function getCreatedAtAttribute($value) {
+        return Carbon::createFromTimestamp(strtotime($value))->timezone(config('app.timezone'))->toDateTimeString();
+    }
+
+    public function getUpdatedAtAttribute($value) {
+        return Carbon::createFromTimestamp(strtotime($value))->timezone(config('app.timezone'))->toDateTimeString();
+    }
+
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.
      *
