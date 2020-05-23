@@ -17,6 +17,7 @@ tags:
   - name: "Users"
     description: "Operations about user. Only admin user can access this routes!"
 paths:
+  #Auth Routes
   /register:
     post:
       tags:
@@ -289,6 +290,7 @@ paths:
               format: "date-time"
               description: "Time in UTC when token expires"
 
+  #Agency Routes
   /agency:
     get:
       tags:
@@ -374,7 +376,7 @@ paths:
         "500":
           description: "The agency could not be updated."
 
-
+  #Users Routes
   /users:
     get:
       tags:
@@ -454,11 +456,41 @@ paths:
           description: "An error has occurred. Check the return message and error response or error logs."
 
   /users/{userId}:
+    get:
+      tags:
+        - "Users"
+      summary: "Get a specific agency user"
+      description: ""
+      operationId: "userInformation"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+
+        - name: "userId"
+          in: "path"
+          description: "ID of specific user"
+          required: true
+          type: "integer"
+          format: "int64"
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/User"
+
     put:
       tags:
         - "Users"
       summary: "Updates a specific agency user"
-      description: "If the password field is not passed, a random password is generated and sent to the user's registration email."
+      description: "If the password field is sent, a notification with the new password will be sent to the user's email"
       operationId: "userUpdate"
       consumes:
         - "application/x-www-form-urlencoded"
