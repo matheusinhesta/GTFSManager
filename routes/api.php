@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return response()->json(['message' => 'Entrou na API']);
+    return response()->json(['message' => 'GTFS Manager check!']);
 });
 
 
@@ -27,6 +27,8 @@ Route::middleware(['jwt.verify'])->group(function () {
             Route::get('', 'AgencyController@index');
             Route::post('', 'AgencyController@update');
         });
+
+        Route::resource('users', 'UserController');
 
 
 //Route::resource('agency', 'AgencyController')->only(['index', 'update']);
