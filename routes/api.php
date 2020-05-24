@@ -35,6 +35,9 @@ Route::middleware(['jwt.verify'])->group(function () {
         // Agency routes
         Route::resource('routes', 'RouteController');
 
+        // Agency fares
+        Route::resource('fare', 'FareAttributeController');
+
 
 //Route::resource('agency', 'AgencyController')->only(['index', 'update']);
     });

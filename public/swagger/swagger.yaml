@@ -18,6 +18,8 @@ tags:
     description: "Operations about user. Only admin user can access this routes!"
   - name: "Routes"
     description: "Operations about agency routes. Only admin user can access this routes!"
+  - name: "Fares"
+    description: "Operations about agency fares. Only admin user can access this routes!"
 paths:
   #Auth Routes
   /register:
@@ -809,6 +811,211 @@ paths:
         "500":
           description: "An error has occurred. Check the return message and error response or error logs."
 
+  #Agency Fares
+  /fares:
+    get:
+      tags:
+        - "Fares"
+      summary: "Get agency fares"
+      description: ""
+      operationId: "fares"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/FareAttribute"
+
+    post:
+      tags:
+        - "Fares"
+      summary: "Creates a new fare for the agency"
+      description: ""
+      operationId: "fareCreate"
+      consumes:
+        - "application/x-www-form-urlencoded"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+
+        - name: "price"
+          in: "formData"
+          type: "number"
+          description: "Fare price, in the unit specified by currency_type."
+          required: true
+
+        - name: "currency_type"
+          in: "formData"
+          type: "string"
+          description: "Currency used to pay the fare."
+          required: true
+
+        - name: "payment_method"
+          in: "formData"
+          type: "boolean"
+          description: "Indicates when the fare must be paid. If true, fare is paid on board. Else fare must be paid before boarding."
+          required: true
+
+        - name: "transfers"
+          in: "formData"
+          type: "string"
+          description: "Indicates the number of transfers permitted on this fare."
+          enum: ['unallowed', 'one', 'two']
+
+        - name: "transfer_duration"
+          in: "formData"
+          type: "integer"
+          description: "Length of time in seconds before a transfer expires. When transfers=0 this field can be used to indicate how long a ticket is valid for or it can can be left empty."
+
+      responses:
+        "201":
+          description: "Success! The fare has been registered."
+        "400":
+          description: "Invalid input."
+        "500":
+          description: "An error has occurred. Check the return message and error response or error logs."
+
+  /fares/{fareId}:
+    get:
+      tags:
+        - "Fares"
+      summary: "Get a specific agency fare"
+      description: ""
+      operationId: "fareInformation"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+
+        - name: "fareId"
+          in: "path"
+          description: "ID of specific fare"
+          required: true
+          type: "integer"
+          format: "int64"
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/FareAttribute"
+        "404":
+          description: "Agency fare not found."
+
+    put:
+      tags:
+        - "Fares"
+      summary: "Updates a specific agency fare"
+      description: ""
+      operationId: "fareUpdate"
+      consumes:
+        - "application/x-www-form-urlencoded"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+
+        - name: "fareId"
+          in: "path"
+          description: "ID of specific route"
+          required: true
+          type: "integer"
+          format: "int64"
+
+        - name: "price"
+          in: "formData"
+          type: "number"
+          description: "Fare price, in the unit specified by currency_type."
+
+        - name: "currency_type"
+          in: "formData"
+          type: "string"
+          description: "Currency used to pay the fare."
+
+        - name: "payment_method"
+          in: "formData"
+          type: "boolean"
+          description: "Indicates when the fare must be paid. If true, fare is paid on board. Else fare must be paid before boarding."
+
+        - name: "transfers"
+          in: "formData"
+          type: "string"
+          description: "Indicates the number of transfers permitted on this fare."
+          enum: ['unallowed', 'one', 'two']
+
+        - name: "transfer_duration"
+          in: "formData"
+          type: "integer"
+          description: "Length of time in seconds before a transfer expires. When transfers=0 this field can be used to indicate how long a ticket is valid for or it can can be left empty."
+
+      responses:
+        "200":
+          description: "Successful operation."
+        "400":
+          description: "Invalid input."
+        "404":
+          description: "Agency fare not found."
+        "500":
+          description: "An error has occurred. Check the return message and error response or error logs."
+
+    delete:
+      tags:
+        - "Fares"
+      summary: "Deletes a specific agency fare"
+      description: ""
+      operationId: "fareDelete"
+      produces:
+        - "application/xml"
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+
+        - name: "fareId"
+          in: "path"
+          description: "ID of specific route"
+          required: true
+          type: "integer"
+          format: "int64"
+      responses:
+        "200":
+          description: "Successful operation."
+        "404":
+          description: "Agency fare not found."
+        "500":
+          description: "An error has occurred. Check the return message and error response or error logs."
+
   /pet/findByStatus:
     get:
       tags:
@@ -1168,6 +1375,7 @@ definitions:
         type: "string"
       type:
         type: "string"
+        enum: ['vlt','subway','train','bus','ferry','tram','cable_car','cable_railway']
       url:
         type: "string"
       color:
@@ -1178,6 +1386,25 @@ definitions:
         type: "integer"
     xml:
       name: "Route"
+
+  FareAttribute:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+      price:
+        type: "number"
+      currency_type:
+        type: "string"
+      payment_method:
+        type: "boolean"
+      transfers:
+        type: "string"
+        enum: ['unallowed', 'one', 'two']
+      transfer_duration:
+        type: "integer"
+    xml:
+      name: "FareAttribute"
 
   Order:
     type: "object"

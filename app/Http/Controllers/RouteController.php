@@ -30,7 +30,7 @@ class RouteController extends Controller {
         $validator = Validator::make($request->all(), [
             'short_name'  => 'required|string|max:255',
             'long_name'   => 'required|string|max:255',
-            'desc'        => 'string|min:1|max:1000',
+            'desc'        => 'string|max:1000',
             'type'        => ['required', Rule::in(['vlt','subway','train','bus','ferry','tram','cable_car','cable_railway'])],
             'url'         => 'string|max:255',
             'color'       => 'string|max:255',
