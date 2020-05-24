@@ -29,8 +29,11 @@ Route::middleware(['jwt.verify'])->group(function () {
         // Edit agency informations
         Route::post('agency', 'AgencyController@update');
 
-
+        // Agency users
         Route::resource('users', 'UserController');
+
+        // Agency routes
+        Route::resource('routes', 'RouteController');
 
 
 //Route::resource('agency', 'AgencyController')->only(['index', 'update']);

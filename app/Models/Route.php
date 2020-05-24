@@ -10,10 +10,11 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Traits\EnumManipulation;
 
 /**
  * Class Route
- * 
+ *
  * @property int $id
  * @property int $agency_id
  * @property string $short_name
@@ -23,11 +24,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $url
  * @property string $color
  * @property string $text_color
- * @property int $short_order
+ * @property int $sort_order
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property string $deleted_at
- * 
+ *
  * @property Agency $agency
  * @property Collection|Attribution[] $attributions
  * @property Collection|EntitySelector[] $entity_selectors
@@ -55,7 +56,7 @@ class Route extends Model
 		'url',
 		'color',
 		'text_color',
-		'short_order'
+		'sort_order'
 	];
 
 	public function agency()
@@ -82,4 +83,20 @@ class Route extends Model
 	{
 		return $this->hasMany(Trip::class);
 	}
+
+	public function getEnumTypeAttribute(){
+	    return EnumManipulation::getEnumValues('routes', 'type');
+    }
+
+    public function getEnumKeyTypeAttribute(){
+        return array_keys(EnumManipulation::getEnumValues('routes', 'type'), $this->type);
+    }
+
+    public function getCreatedAtAttribute($value) {
+        return Carbon::createFromTimestamp(strtotime($value))->timezone(config('app.timezone'))->toDateTimeString();
+    }
+
+    public function getUpdatedAtAttribute($value) {
+        return Carbon::createFromTimestamp(strtotime($value))->timezone(config('app.timezone'))->toDateTimeString();
+    }
 }

@@ -16,6 +16,8 @@ tags:
     description: "Everything about agency informations"
   - name: "Users"
     description: "Operations about user. Only admin user can access this routes!"
+  - name: "Routes"
+    description: "Operations about agency routes. Only admin user can access this routes!"
 paths:
   #Auth Routes
   /register:
@@ -278,17 +280,10 @@ paths:
       responses:
         "200":
           description: "Successful operation"
-          headers:
-            access_token:
-              type: "string"
-              description: "JWT token used for any request that needs to be authenticated"
-            token_type:
-              type: "string"
-              description: "Tokens type"
-            expires_in:
-              type: "string"
-              format: "date-time"
-              description: "Time in UTC when token expires"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/User"
 
   #Agency Routes
   /agency:
@@ -576,6 +571,241 @@ paths:
           description: "You cannot delete yourself."
         "404":
           description: "User not found."
+        "500":
+          description: "An error has occurred. Check the return message and error response or error logs."
+
+  #Agency Routes
+  /routes:
+    get:
+      tags:
+        - "Routes"
+      summary: "Get agency routes"
+      description: ""
+      operationId: "routes"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Route"
+
+    post:
+      tags:
+        - "Routes"
+      summary: "Creates a new route for the agency"
+      description: ""
+      operationId: "routeCreate"
+      consumes:
+        - "application/x-www-form-urlencoded"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+
+        - name: "short_name"
+          in: "formData"
+          type: "string"
+          description: "Short name of a route. This will often be a short, abstract identifier like '32', '100X', or 'Green' that riders use to identify a route, but which doesn't give any indication of what places the route serves."
+          required: true
+
+        - name: "long_name"
+          in: "formData"
+          type: "string"
+          description: "Full name of a route. This name is generally more descriptive than the route_short_name and often includes the route's destination or stop."
+          required: true
+
+        - name: "type"
+          in: "formData"
+          type: "string"
+          description: "Indicates the type of transportation used on a route."
+          enum: ['vlt','subway','train','bus','ferry','tram','cable_car','cable_railway']
+          required: true
+
+        - name: "desc"
+          in: "formData"
+          type: "string"
+          description: "Description of a route that provides useful, quality information. Do not simply duplicate the name of the route."
+
+        - name: "url"
+          in: "formData"
+          type: "string"
+          description: "URL of a web page about the particular route. Should be different from the agency.url value."
+
+        - name: "color"
+          in: "formData"
+          type: "string"
+          description: "Route color designation that matches public facing material. Defaults to white (FFFFFF) when omitted or left empty. The color difference between 'color' and 'text_color' should provide sufficient contrast when viewed on a black and white screen."
+
+        - name: "text_color"
+          in: "formData"
+          type: "string"
+          description: "Legible color to use for text drawn against a background of route_color. Defaults to black (000000) when omitted or left empty. The color difference between 'color' and 'text_color' should provide sufficient contrast when viewed on a black and white screen."
+
+        - name: "sort_order"
+          in: "formData"
+          type: "integer"
+          description: "Orders the routes in a way which is ideal for presentation to customers. Routes with smaller route_sort_order values should be displayed first."
+
+      responses:
+        "201":
+          description: "Success! The route has been registered."
+        "400":
+          description: "Invalid input."
+        "500":
+          description: "An error has occurred. Check the return message and error response or error logs."
+
+  /routes/{routeId}:
+    get:
+      tags:
+        - "Routes"
+      summary: "Get a specific agency route"
+      description: ""
+      operationId: "routeInformation"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+
+        - name: "routeId"
+          in: "path"
+          description: "ID of specific user"
+          required: true
+          type: "integer"
+          format: "int64"
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Route"
+        "404":
+          description: "Agency route not found."
+
+    put:
+      tags:
+        - "Routes"
+      summary: "Updates a specific agency route"
+      description: ""
+      operationId: "routeUpdate"
+      consumes:
+        - "application/x-www-form-urlencoded"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+
+        - name: "routeId"
+          in: "path"
+          description: "ID of specific route"
+          required: true
+          type: "integer"
+          format: "int64"
+
+        - name: "short_name"
+          in: "formData"
+          type: "string"
+          description: "Short name of a route. This will often be a short, abstract identifier like '32', '100X', or 'Green' that riders use to identify a route, but which doesn't give any indication of what places the route serves."
+
+        - name: "long_name"
+          in: "formData"
+          type: "string"
+          description: "Full name of a route. This name is generally more descriptive than the route_short_name and often includes the route's destination or stop."
+
+        - name: "type"
+          in: "formData"
+          type: "string"
+          description: "Indicates the type of transportation used on a route."
+          enum: ['vlt','subway','train','bus','ferry','tram','cable_car','cable_railway']
+
+        - name: "desc"
+          in: "formData"
+          type: "string"
+          description: "Description of a route that provides useful, quality information. Do not simply duplicate the name of the route."
+
+        - name: "url"
+          in: "formData"
+          type: "string"
+          description: "URL of a web page about the particular route. Should be different from the agency.url value."
+
+        - name: "color"
+          in: "formData"
+          type: "string"
+          description: "Route color designation that matches public facing material. Defaults to white (FFFFFF) when omitted or left empty. The color difference between 'color' and 'text_color' should provide sufficient contrast when viewed on a black and white screen."
+
+        - name: "text_color"
+          in: "formData"
+          type: "string"
+          description: "Legible color to use for text drawn against a background of route_color. Defaults to black (000000) when omitted or left empty. The color difference between 'color' and 'text_color' should provide sufficient contrast when viewed on a black and white screen."
+
+        - name: "sort_order"
+          in: "formData"
+          type: "integer"
+          description: "Orders the routes in a way which is ideal for presentation to customers. Routes with smaller route_sort_order values should be displayed first."
+
+      responses:
+        "200":
+          description: "Successful operation."
+        "400":
+          description: "Invalid input."
+        "404":
+          description: "Agency route not found."
+        "500":
+          description: "An error has occurred. Check the return message and error response or error logs."
+
+    delete:
+      tags:
+        - "Routes"
+      summary: "Deletes a specific agency route"
+      description: ""
+      operationId: "deleteRoute"
+      produces:
+        - "application/xml"
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+
+        - name: "routeId"
+          in: "path"
+          description: "ID of specific route"
+          required: true
+          type: "integer"
+          format: "int64"
+      responses:
+        "200":
+          description: "Successful operation."
+        "404":
+          description: "Agency route not found."
         "500":
           description: "An error has occurred. Check the return message and error response or error logs."
 
@@ -924,6 +1154,30 @@ definitions:
         type: "string"
     xml:
       name: "Agency"
+
+  Route:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+      short_name:
+        type: "string"
+      long_name:
+        type: "string"
+      desc:
+        type: "string"
+      type:
+        type: "string"
+      url:
+        type: "string"
+      color:
+        type: "string"
+      text_color:
+        type: "string"
+      sort_order:
+        type: "integer"
+    xml:
+      name: "Route"
 
   Order:
     type: "object"

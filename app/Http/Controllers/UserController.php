@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 class UserController extends Controller {
+
     /**
      * Display a listing of the resource.
      *
@@ -23,10 +24,8 @@ class UserController extends Controller {
                         }])->where('agency_id', \Auth::user()->agency_id)
                            ->get(['id', 'type_id', 'name', 'email', 'created_at', 'updated_at']);
 
-
-        return response()->json(['users' => $users], 200);
+        return response()->json(compact('users'), 200);
     }
-
 
     /**
      * Store a newly created resource in storage.
@@ -51,7 +50,7 @@ class UserController extends Controller {
             if(empty($request->password))
                 $request->request->add(['password' => Str::random(10)]);
 
-            $user = User::create(array_merge($request->all(), [
+            $user = User::create(array_merge($request->except('agency_id'), [
                 'agency_id' => \Auth::user()->agency_id,
                 'password'  => Hash::make($request->password)
             ]));
@@ -87,7 +86,6 @@ class UserController extends Controller {
         return response()->json(compact('user'), 200);
     }
 
-
     /**
      * Update the specified resource in storage.
      *
@@ -111,7 +109,7 @@ class UserController extends Controller {
         DB::beginTransaction();
 
         try {
-            $user->update(array_merge($request->all(), [
+            $user->update(array_merge($request->except('agency_id'), [
                 'type_id'  => (\Auth::user()->id == $id ? \Auth::user()->type_id : $request->type_id),
                 'password' => ($request->has('password') ? Hash::make($request->password) : $user->password)
             ]));
