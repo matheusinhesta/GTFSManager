@@ -16,8 +16,8 @@ class FareAttributeController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function index(){
-        $fares = FareAttribute::with(['fare_rules'])->where('agency_id', \Auth::user()->agency_id)->get();
-        return response()->json(compact('fares'));
+        $fares = FareAttribute::where('agency_id', \Auth::user()->agency_id)->get(['id', 'price', 'currency_type', 'payment_method', 'transfers', 'transfer_duration', 'created_at', 'updated_at']);
+        return response()->json(compact('fares'), 200);
     }
 
 
@@ -62,8 +62,8 @@ class FareAttributeController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function show($id) {
-        $fare = FareAttribute::with(['fare_rules'])->where('agency_id', \Auth::user()->agency_id)->findOrFail($id);
-        return response()->json(compact('fare'));
+        $fare = FareAttribute::select(['id', 'price', 'currency_type', 'payment_method', 'transfers', 'transfer_duration', 'created_at', 'updated_at'])->with(['fare_rules'])->where('agency_id', \Auth::user()->agency_id)->findOrFail($id);
+        return response()->json(compact('fare'), 200);
     }
 
 
@@ -91,7 +91,7 @@ class FareAttributeController extends Controller {
         $fare = FareAttribute::where('agency_id', \Auth::user()->agency_id)->findOrFail($id);
 
         try{
-            $fare->update(array_merge($request->except('agency_id')));
+            $fare->update($request->except('agency_id'));
         } catch (\Exception $e){
             DB::rollback();
             return response()->json(['message' => 'Could not update fare. Try again.'], 500);

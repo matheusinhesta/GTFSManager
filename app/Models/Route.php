@@ -76,7 +76,7 @@ class Route extends Model
 
 	public function fare_rules()
 	{
-		return $this->hasMany(FareRule::class);
+		return $this->hasMany(FareRule::class)->with('fare_attribute', 'origin', 'destination', 'contain')->select(['id', 'route_id', 'fare_id', 'origin_id', 'destination_id', 'contains_id', 'created_at', 'updated_at']);
 	}
 
 	public function trips()

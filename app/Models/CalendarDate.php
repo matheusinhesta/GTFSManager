@@ -20,7 +20,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property string $deleted_at
+ * @property int $agency_id
  * 
+ * @property Agency $agency
  * @property Service $service
  *
  * @package App\Models
@@ -31,7 +33,8 @@ class CalendarDate extends Model
 	protected $table = 'calendar_dates';
 
 	protected $casts = [
-		'service_id' => 'int'
+		'service_id' => 'int',
+		'agency_id' => 'int'
 	];
 
 	protected $dates = [
@@ -41,8 +44,14 @@ class CalendarDate extends Model
 	protected $fillable = [
 		'service_id',
 		'date',
-		'exception_type'
+		'exception_type',
+		'agency_id'
 	];
+
+	public function agency()
+	{
+		return $this->belongsTo(Agency::class);
+	}
 
 	public function service()
 	{

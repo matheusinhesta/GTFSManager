@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class FareRule
- * 
+ *
  * @property int $id
  * @property int $fare_id
  * @property int $route_id
@@ -22,8 +22,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property string $deleted_at
- * 
- * @property Zone $zone
+ *
+ * @property Origin $origin
+ * @property Destination $destination
+ * @property Contain $contain
  * @property FareAttribute $fare_attribute
  * @property Route $route
  *
@@ -50,18 +52,36 @@ class FareRule extends Model
 		'contains_id'
 	];
 
-	public function zone()
+	public function origin()
 	{
-		return $this->belongsTo(Zone::class, 'origin_id');
+		return $this->belongsTo(Zone::class, 'origin_id')->select(['id', 'name', 'created_at', 'updated_at']);
 	}
+
+    public function destination()
+    {
+        return $this->belongsTo(Zone::class, 'destination_id')->select(['id', 'name', 'created_at', 'updated_at']);
+    }
+
+    public function contain()
+    {
+        return $this->belongsTo(Zone::class, 'contains_id')->select(['id', 'name', 'created_at', 'updated_at']);
+    }
 
 	public function fare_attribute()
 	{
-		return $this->belongsTo(FareAttribute::class, 'fare_id');
+		return $this->belongsTo(FareAttribute::class, 'fare_id')->select(['id', 'price', 'currency_type', 'payment_method', 'transfers', 'transfer_duration', 'created_at', 'updated_at']);
 	}
 
 	public function route()
 	{
-		return $this->belongsTo(Route::class);
+		return $this->belongsTo(Route::class, 'route_id')->select(['id', 'short_name', 'long_name', 'desc', 'type', 'url', 'color', 'text_color', 'sort_order', 'created_at', 'updated_at']);
 	}
+
+    public function getCreatedAtAttribute($value) {
+        return Carbon::createFromTimestamp(strtotime($value))->timezone(config('app.timezone'))->toDateTimeString();
+    }
+
+    public function getUpdatedAtAttribute($value) {
+        return Carbon::createFromTimestamp(strtotime($value))->timezone(config('app.timezone'))->toDateTimeString();
+    }
 }

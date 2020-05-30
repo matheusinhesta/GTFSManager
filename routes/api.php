@@ -36,10 +36,18 @@ Route::middleware(['jwt.verify'])->group(function () {
         Route::resource('routes', 'RouteController');
 
         // Agency fares
-        Route::resource('fare', 'FareAttributeController');
+        Route::resource('fares', 'FareAttributeController');
 
+        // Agency calendar_dates
+        Route::resource('calendar-dates', 'CalendarDateController');
 
-//Route::resource('agency', 'AgencyController')->only(['index', 'update']);
+        // Agency zones
+        Route::resource('zones', 'ZoneController');
+
+        // Agency fare rules
+        Route::resource('fares/{fare_id}/rules', 'FareRuleController');
+
+        //Route::resource('agency', 'AgencyController')->only(['index', 'update']);
     });
 
 });

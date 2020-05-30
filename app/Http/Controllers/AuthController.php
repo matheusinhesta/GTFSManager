@@ -62,7 +62,7 @@ class AuthController extends Controller {
         }
 
         return response()->json(
-            $user->with(
+            User::with(
                 ['user_type' => function($q){
                         $q->select(['id', 'description']);
                     }
@@ -70,7 +70,7 @@ class AuthController extends Controller {
                     $q->select(['id', 'name', 'timezone', 'lang', 'fare_url', 'phone', 'email', 'created_at', 'updated_at']);
                 }])
                 ->select(['id', 'agency_id', 'type_id', 'name', 'email'])
-                ->get()
+                ->findOrFail(\Auth::user()->id)
         );
     }
 

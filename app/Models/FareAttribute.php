@@ -54,12 +54,12 @@ class FareAttribute extends Model
 
 	public function agency()
 	{
-		return $this->belongsTo(Agency::class);
+		return $this->belongsTo(Agency::class)->select(['id', 'name', 'timezone', 'lang', 'fare_url', 'phone', 'email', 'created_at', 'updated_at']);
 	}
 
 	public function fare_rules()
 	{
-		return $this->hasMany(FareRule::class, 'fare_id');
+		return $this->hasMany(FareRule::class, 'fare_id')->with('route', 'origin', 'destination', 'contain')->select(['id', 'route_id', 'fare_id', 'origin_id', 'destination_id', 'contains_id', 'created_at', 'updated_at']);
 	}
 
     public function getEnumTransfersAttribute(){

@@ -16,8 +16,8 @@ class RouteController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function index() {
-        $routes = Route::with(['attributions', 'entity_selectors', 'fare_rules', 'trips'])->where('agency_id', \Auth::user()->agency_id)->get();
-        return response()->json(compact('routes'));
+        $routes = Route::where('agency_id', \Auth::user()->agency_id)->get(['id', 'short_name', 'long_name', 'desc', 'type', 'url', 'color', 'text_color', 'sort_order', 'created_at', 'updated_at']);
+        return response()->json(compact('routes'), 200);
     }
 
     /**
@@ -64,10 +64,10 @@ class RouteController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function show($id) {
-        $route = Route::with(['attributions', 'entity_selectors', 'fare_rules', 'trips'])
+        $route = Route::select(['id', 'short_name', 'long_name', 'desc', 'type', 'url', 'color', 'text_color', 'sort_order', 'created_at', 'updated_at'])->with(['attributions', 'entity_selectors', 'fare_rules', 'trips'])
                         ->where('agency_id', \Auth::user()->agency_id)
                         ->findOrFail($id);
-        return response()->json(compact('route'));
+        return response()->json(compact('route'), 200);
     }
 
 
@@ -98,7 +98,7 @@ class RouteController extends Controller {
         $route = Route::where('agency_id', \Auth::user()->agency_id)->findOrFail($id);
 
         try{
-            $route->update(array_merge($request->except('agency_id')));
+            $route->update($request->except('agency_id'));
         } catch (\Exception $e){
             DB::rollback();
             return response()->json(['message' => 'Could not update route. Try again.'], 500);
