@@ -12,16 +12,15 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class CalendarDate
- * 
+ *
  * @property int $id
- * @property int $service_id
  * @property Carbon $date
  * @property string $exception_type
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property string $deleted_at
  * @property int $agency_id
- * 
+ *
  * @property Agency $agency
  * @property Service $service
  *
@@ -55,6 +54,18 @@ class CalendarDate extends Model
 
 	public function service()
 	{
-		return $this->belongsTo(Service::class);
+		return $this->belongsTo(Service::class)->select(['id', 'name', 'created_at', 'updated_at']);
 	}
+
+    public function getDateAttribute($value) {
+        return Carbon::createFromTimestamp(strtotime($value))->timezone(config('app.timezone'))->toDateString();
+    }
+
+    public function getCreatedAtAttribute($value) {
+        return Carbon::createFromTimestamp(strtotime($value))->timezone(config('app.timezone'))->toDateTimeString();
+    }
+
+    public function getUpdatedAtAttribute($value) {
+        return Carbon::createFromTimestamp(strtotime($value))->timezone(config('app.timezone'))->toDateTimeString();
+    }
 }

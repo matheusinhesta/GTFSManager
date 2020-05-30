@@ -16,10 +16,16 @@ tags:
     description: "Everything about agency informations"
   - name: "Users"
     description: "Operations about user. Only admin user can access this routes!"
+  - name: "Calendar Dates"
+    description: "Operations about agency calendar dates. Only admin user can access this routes!"
+  - name: "Fares"
+    description: "Operations about agency fares and fare rules. Only admin user can access this routes!"
   - name: "Routes"
     description: "Operations about agency routes. Only admin user can access this routes!"
-  - name: "Fares"
-    description: "Operations about agency fares. Only admin user can access this routes!"
+  - name: "Services"
+    description: "Operations about agency services. Only admin user can access this routes!"
+  - name: "Zones"
+    description: "Operations about agency zones. Only admin user can access this routes!"
 paths:
   #Auth Routes
   /register:
@@ -452,7 +458,7 @@ paths:
         "500":
           description: "An error has occurred. Check the return message and error response or error logs."
 
-  /users/{userId}:
+  /users/{user_id}:
     get:
       tags:
         - "Users"
@@ -469,7 +475,7 @@ paths:
           type: "string"
           format: "Bearer JWT token"
 
-        - name: "userId"
+        - name: "user_id"
           in: "path"
           description: "ID of specific user"
           required: true
@@ -501,7 +507,7 @@ paths:
           type: "string"
           format: "Bearer JWT token"
 
-        - name: "userId"
+        - name: "user_id"
           in: "path"
           description: "ID of specific user"
           required: true
@@ -560,7 +566,7 @@ paths:
           type: "string"
           format: "Bearer JWT token"
 
-        - name: "userId"
+        - name: "user_id"
           in: "path"
           description: "ID of specific user"
           required: true
@@ -671,7 +677,7 @@ paths:
         "500":
           description: "An error has occurred. Check the return message and error response or error logs."
 
-  /routes/{routeId}:
+  /routes/{route_id}:
     get:
       tags:
         - "Routes"
@@ -688,7 +694,7 @@ paths:
           type: "string"
           format: "Bearer JWT token"
 
-        - name: "routeId"
+        - name: "route_id"
           in: "path"
           description: "ID of specific user"
           required: true
@@ -722,7 +728,7 @@ paths:
           type: "string"
           format: "Bearer JWT token"
 
-        - name: "routeId"
+        - name: "route_id"
           in: "path"
           description: "ID of specific route"
           required: true
@@ -797,7 +803,7 @@ paths:
           type: "string"
           format: "Bearer JWT token"
 
-        - name: "routeId"
+        - name: "route_id"
           in: "path"
           description: "ID of specific route"
           required: true
@@ -891,7 +897,7 @@ paths:
         "500":
           description: "An error has occurred. Check the return message and error response or error logs."
 
-  /fares/{fareId}:
+  /fares/{fare_id}:
     get:
       tags:
         - "Fares"
@@ -908,7 +914,7 @@ paths:
           type: "string"
           format: "Bearer JWT token"
 
-        - name: "fareId"
+        - name: "fare_id"
           in: "path"
           description: "ID of specific fare"
           required: true
@@ -942,9 +948,9 @@ paths:
           type: "string"
           format: "Bearer JWT token"
 
-        - name: "fareId"
+        - name: "fare_id"
           in: "path"
-          description: "ID of specific route"
+          description: "ID of specific fare"
           required: true
           type: "integer"
           format: "int64"
@@ -1002,9 +1008,9 @@ paths:
           type: "string"
           format: "Bearer JWT token"
 
-        - name: "fareId"
+        - name: "fare_id"
           in: "path"
-          description: "ID of specific route"
+          description: "ID of specific fare"
           required: true
           type: "integer"
           format: "int64"
@@ -1016,18 +1022,745 @@ paths:
         "500":
           description: "An error has occurred. Check the return message and error response or error logs."
 
-securityDefinitions:
-  petstore_auth:
-    type: "oauth2"
-    authorizationUrl: "http://petstore.swagger.io/oauth/dialog"
-    flow: "implicit"
-    scopes:
-      write:pets: "modify pets in your account"
-      read:pets: "read your pets"
-  api_key:
-    type: "apiKey"
-    name: "api_key"
-    in: "header"
+  #Agency Fare Rules
+  /fares/{fare_id}/rules:
+    get:
+      tags:
+        - "Fares"
+      summary: "Get fare rules"
+      description: ""
+      operationId: "faresRules"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+
+        - name: "fare_id"
+          in: "path"
+          description: "ID of specific fare"
+          required: true
+          type: "integer"
+          format: "int64"
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/FareRule"
+        "404":
+          description: "Agency fare rules not found."
+
+    post:
+      tags:
+        - "Fares"
+      summary: "Creates a new rule for the fare"
+      description: ""
+      operationId: "fareRuleCreate"
+      consumes:
+        - "application/x-www-form-urlencoded"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+
+        - name: "fare_id"
+          in: "path"
+          description: "ID of specific fare"
+          required: true
+          type: "integer"
+          format: "int64"
+
+        - name: "route_id"
+          in: "formData"
+          type: "integer"
+          description: "Identifies a route (referencing routes.route_id) associated with the fare class. If several routes with the same fare attributes exist, create a record in fare_rules for each route."
+          required: true
+
+        - name: "origin_id"
+          in: "formData"
+          type: "integer"
+          description: "Identifies an origin zone (referencing zones.zone_id). If a fare class has multiple origin zones, create a record in fare_rules for each origin_id."
+
+        - name: "destination_id"
+          in: "formData"
+          type: "integer"
+          description: "Identifies a destination zone (referencing zones.zone_id). If a fare class has multiple destination zones, create a record in fare_rules for each destination_id."
+
+        - name: "contains_id"
+          in: "formData"
+          type: "integer"
+          description: "Identifies the zones (referencing zones.zone_id) that a rider will enter while using a given fare class. Used in some systems to calculate correct fare class."
+
+      responses:
+        "201":
+          description: "Success! The fare rule has been registered."
+        "400":
+          description: "Invalid input."
+        "404":
+          description: "Agency fare not found."
+        "500":
+          description: "An error has occurred. Check the return message and error response or error logs."
+
+  /fares/{fare_id}/rules/{rule_id}:
+    get:
+      tags:
+        - "Fares"
+      summary: "Get a specific agency fare rule"
+      description: ""
+      operationId: "fareRuleInformation"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+
+        - name: "fare_id"
+          in: "path"
+          description: "ID of specific fare"
+          required: true
+          type: "integer"
+          format: "int64"
+
+        - name: "rule_id"
+          in: "path"
+          description: "ID of specific fare rule"
+          required: true
+          type: "integer"
+          format: "int64"
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/FareRule"
+        "404":
+          description: "Agency fare rule not found."
+
+    put:
+      tags:
+        - "Fares"
+      summary: "Updates a specific agency fare rule"
+      description: ""
+      operationId: "fareRuleUpdate"
+      consumes:
+        - "application/x-www-form-urlencoded"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+
+        - name: "fare_id"
+          in: "path"
+          description: "ID of specific fare"
+          required: true
+          type: "integer"
+          format: "int64"
+
+        - name: "rule_id"
+          in: "path"
+          description: "ID of specific fare rule"
+          required: true
+          type: "integer"
+          format: "int64"
+
+        - name: "route_id"
+          in: "formData"
+          type: "integer"
+          description: "Identifies a route (referencing routes.route_id) associated with the fare class. If several routes with the same fare attributes exist, create a record in fare_rules for each route."
+
+        - name: "origin_id"
+          in: "formData"
+          type: "integer"
+          description: "Identifies an origin zone (referencing zones.zone_id). If a fare class has multiple origin zones, create a record in fare_rules for each origin_id."
+
+        - name: "destination_id"
+          in: "formData"
+          type: "integer"
+          description: "Identifies a destination zone (referencing zones.zone_id). If a fare class has multiple destination zones, create a record in fare_rules for each destination_id."
+
+        - name: "contains_id"
+          in: "formData"
+          type: "integer"
+          description: "Identifies the zones (referencing zones.zone_id) that a rider will enter while using a given fare class. Used in some systems to calculate correct fare class."
+
+      responses:
+        "200":
+          description: "Successful operation."
+        "400":
+          description: "Invalid input."
+        "404":
+          description: "Agency fare rule not found."
+        "500":
+          description: "An error has occurred. Check the return message and error response or error logs."
+
+    delete:
+      tags:
+        - "Fares"
+      summary: "Deletes a specific agency fare"
+      description: ""
+      operationId: "fareRuleDelete"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+
+        - name: "fare_id"
+          in: "path"
+          description: "ID of specific fare"
+          required: true
+          type: "integer"
+          format: "int64"
+
+        - name: "rule_id"
+          in: "path"
+          description: "ID of specific fare rule"
+          required: true
+          type: "integer"
+          format: "int64"
+      responses:
+        "200":
+          description: "Successful operation."
+        "404":
+          description: "Agency fare rule not found."
+        "500":
+          description: "An error has occurred. Check the return message and error response or error logs."
+
+  #Agency Calendar Dates
+  /calendar-dates:
+    get:
+      tags:
+        - "Calendar Dates"
+      summary: "Get agency calendar dates"
+      description: ""
+      operationId: "calendarDates"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/CalendarDate"
+
+    post:
+      tags:
+        - "Calendar Dates"
+      summary: "Creates a new calendar date for the agency"
+      description: ""
+      operationId: "calendarDatesCreate"
+      consumes:
+        - "application/x-www-form-urlencoded"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+
+        - name: "service_id"
+          in: "formData"
+          type: "integer"
+          description: "ID of specific agency service (services.id)"
+          required: true
+
+        - name: "date"
+          in: "formData"
+          type: "string"
+          format: "Y-m-d"
+          description: "Date when service exception occurs."
+          required: true
+
+        - name: "exception_type"
+          in: "formData"
+          type: "string"
+          description: "Indicates whether service is available on the date specified in the date field."
+          enum: ['available', 'not_available']
+          required: true
+
+      responses:
+        "201":
+          description: "Success! The calendar date has been registered."
+        "400":
+          description: "Invalid input."
+        "500":
+          description: "An error has occurred. Check the return message and error response or error logs."
+
+  /calendar-dates/{date_id}:
+    get:
+      tags:
+        - "Calendar Dates"
+      summary: "Get a specific agency calendar date"
+      description: ""
+      operationId: "calendarDateInformation"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+
+        - name: "date_id"
+          in: "path"
+          description: "ID of specific calendar date"
+          required: true
+          type: "integer"
+          format: "int64"
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/CalendarDate"
+        "404":
+          description: "Agency calendar date not found."
+
+    put:
+      tags:
+        - "Calendar Dates"
+      summary: "Updates a specific agency calendar date"
+      description: ""
+      operationId: "calendarDateUpdate"
+      consumes:
+        - "application/x-www-form-urlencoded"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+
+        - name: "date_id"
+          in: "path"
+          description: "ID of specific calendar date"
+          type: "integer"
+          format: "int64"
+          required: true
+
+        - name: "service_id"
+          in: "formData"
+          type: "integer"
+          description: "ID of specific agency service (services.id)"
+
+        - name: "date"
+          in: "formData"
+          type: "string"
+          format: "Y-m-d"
+          description: "Date when service exception occurs."
+
+        - name: "exception_type"
+          in: "formData"
+          type: "string"
+          description: "Indicates whether service is available on the date specified in the date field."
+          enum: ['available', 'not_available']
+
+      responses:
+        "200":
+          description: "Successful operation."
+        "400":
+          description: "Invalid input."
+        "404":
+          description: "Agency calendar date not found."
+        "500":
+          description: "An error has occurred. Check the return message and error response or error logs."
+
+    delete:
+      tags:
+        - "Calendar Dates"
+      summary: "Deletes a specific agency calendar date"
+      description: ""
+      operationId: "deleteCalendarDate"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+
+        - name: "date_id"
+          in: "path"
+          description: "ID of specific calendar date"
+          required: true
+          type: "integer"
+          format: "int64"
+      responses:
+        "200":
+          description: "Successful operation."
+        "404":
+          description: "Agency calendar date not found."
+        "500":
+          description: "An error has occurred. Check the return message and error response or error logs."
+
+  #Agency Services
+  /services:
+    get:
+      tags:
+        - "Services"
+      summary: "Get agency services"
+      description: ""
+      operationId: "services"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Service"
+
+    post:
+      tags:
+        - "Services"
+      summary: "Creates a new service for the agency"
+      description: ""
+      operationId: "servicesCreate"
+      consumes:
+        - "application/x-www-form-urlencoded"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+
+        - name: "name"
+          in: "formData"
+          type: "string"
+          description: "Service name."
+          required: true
+
+      responses:
+        "201":
+          description: "Success! The service has been registered."
+        "400":
+          description: "Invalid input."
+        "500":
+          description: "An error has occurred. Check the return message and error response or error logs."
+
+  /services/{service_id}:
+    get:
+      tags:
+        - "Services"
+      summary: "Get a specific agency service"
+      description: ""
+      operationId: "serviceInformation"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+
+        - name: "service_id"
+          in: "path"
+          description: "ID of specific agency service (services.id)"
+          required: true
+          type: "integer"
+          format: "int64"
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Service"
+        "404":
+          description: "Agency service not found."
+
+    put:
+      tags:
+        - "Services"
+      summary: "Updates a specific agency service"
+      description: ""
+      operationId: "serviceUpdate"
+      consumes:
+        - "application/x-www-form-urlencoded"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+
+        - name: "service_id"
+          in: "path"
+          description: "ID of specific agency service (services.id)"
+          required: true
+          type: "integer"
+          format: "int64"
+
+        - name: "name"
+          in: "formData"
+          type: "string"
+          description: "Service name."
+          required: true
+
+      responses:
+        "200":
+          description: "Successful operation."
+        "400":
+          description: "Invalid input."
+        "404":
+          description: "Agency service not found."
+        "500":
+          description: "An error has occurred. Check the return message and error response or error logs."
+
+    delete:
+      tags:
+        - "Services"
+      summary: "Deletes a specific agency service"
+      description: ""
+      operationId: "deleteService"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+
+        - name: "service_id"
+          in: "path"
+          description: "ID of specific agency service (services.id)"
+          required: true
+          type: "integer"
+          format: "int64"
+
+      responses:
+        "200":
+          description: "Successful operation."
+        "404":
+          description: "Agency service not found."
+        "500":
+          description: "An error has occurred. Check the return message and error response or error logs."
+
+  #Agency Zones
+  /zones:
+    get:
+      tags:
+        - "Zones"
+      summary: "Get agency zones"
+      description: ""
+      operationId: "zones"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Zone"
+
+    post:
+      tags:
+        - "Zones"
+      summary: "Creates a new zone for the agency"
+      description: ""
+      operationId: "zonesCreate"
+      consumes:
+        - "application/x-www-form-urlencoded"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+
+        - name: "name"
+          in: "formData"
+          type: "string"
+          description: "Zone name."
+          required: true
+
+      responses:
+        "201":
+          description: "Success! The zone has been registered."
+        "400":
+          description: "Invalid input."
+        "500":
+          description: "An error has occurred. Check the return message and error response or error logs."
+
+  /zones/{zone_id}:
+    get:
+      tags:
+        - "Zones"
+      summary: "Get a specific agency zone"
+      description: ""
+      operationId: "zoneInformation"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+
+        - name: "zone_id"
+          in: "path"
+          description: "ID of specific agency zone (zones.id)"
+          required: true
+          type: "integer"
+          format: "int64"
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Zone"
+        "404":
+          description: "Agency zone not found."
+
+    put:
+      tags:
+        - "Zones"
+      summary: "Updates a specific agency zone"
+      description: ""
+      operationId: "zoneUpdate"
+      consumes:
+        - "application/x-www-form-urlencoded"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+
+        - name: "zone_id"
+          in: "path"
+          description: "ID of specific agency zone (zones.id)"
+          required: true
+          type: "integer"
+          format: "int64"
+
+        - name: "name"
+          in: "formData"
+          type: "string"
+          description: "Zone name."
+          required: true
+
+      responses:
+        "200":
+          description: "Successful operation."
+        "400":
+          description: "Invalid input."
+        "404":
+          description: "Agency zone not found."
+        "500":
+          description: "An error has occurred. Check the return message and error response or error logs."
+
+    delete:
+      tags:
+        - "Zones"
+      summary: "Deletes a specific agency zone"
+      description: ""
+      operationId: "deleteZone"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+
+        - name: "zone_id"
+          in: "path"
+          description: "ID of specific agency zone (zones.id)"
+          required: true
+          type: "integer"
+          format: "int64"
+
+      responses:
+        "200":
+          description: "Successful operation."
+        "404":
+          description: "Agency zone not found."
+        "500":
+          description: "An error has occurred. Check the return message and error response or error logs."
+
 definitions:
   User:
     type: "object"
@@ -1110,6 +1843,60 @@ definitions:
         type: "integer"
     xml:
       name: "FareAttribute"
+
+  FareRule:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+      fare_id:
+        type: "integer"
+      route_id:
+        type: "integer"
+      origin_id:
+        type: "integer"
+      destination_id:
+        type: "integer"
+      contains_id:
+        type: "integer"
+    xml:
+      name: "FareRule"
+
+  CalendarDate:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+      service_id:
+        type: "integer"
+      date:
+        type: "string"
+        format: "Y-m-d"
+      exception_type:
+        type: "string"
+        enum: ['available', 'not_available']
+    xml:
+      name: "CalendarDate"
+
+  Service:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+      name:
+        type: "string"
+    xml:
+      name: "Service"
+
+  Zone:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+      name:
+        type: "string"
+    xml:
+      name: "Service"
 
 
   ApiResponse:

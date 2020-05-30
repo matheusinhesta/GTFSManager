@@ -3,18 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Models\CalendarDate;
+use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Validator;
 
-class CalendarDateController extends Controller
-{
+class CalendarDateController extends Controller {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
     public function index(){
-        $dates = CalendarDate::where('agency_id', \Auth::user()->agency_id)->get();
+        $dates = CalendarDate::with('service')->where('agency_id', \Auth::user()->agency_id)->get(['id', 'service_id', 'date', 'exception_type', 'created_at', 'updated_at']);
         return response()->json(compact('dates'), 200);
     }
 
@@ -27,6 +29,7 @@ class CalendarDateController extends Controller
     public function store(Request $request) {
         $validator = Validator::make($request->all(), [
             'date'           => 'required|date|date_format:Y-m-d',
+            'service_id'     => ['required', 'integer', Rule::in(Service::where('agency_id', \Auth::user()->agency_id)->pluck('id'))],
             'exception_type' => ['required', Rule::in(['available', 'not_available'])]
         ]);
 
@@ -70,6 +73,7 @@ class CalendarDateController extends Controller
     public function update(Request $request, $id) {
         $validator = Validator::make($request->all(), [
             'date'           => 'date|date_format:Y-m-d',
+            'service_id'     => ['integer', Rule::in(Service::where('agency_id', \Auth::user()->agency_id)->pluck('id'))],
             'exception_type' => [Rule::in(['available', 'not_available'])]
         ]);
 
@@ -89,7 +93,7 @@ class CalendarDateController extends Controller
 
         DB::commit();
 
-        return response()->json(['message' => 'Success! The calendar date has been updated.'],201);
+        return response()->json(['message' => 'Success! The calendar date has been updated.'],200);
     }
 
     /**

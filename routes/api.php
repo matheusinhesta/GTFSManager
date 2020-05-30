@@ -41,6 +41,9 @@ Route::middleware(['jwt.verify'])->group(function () {
         // Agency calendar_dates
         Route::resource('calendar-dates', 'CalendarDateController');
 
+        // Agency services
+        Route::resource('services', 'ServiceController');
+
         // Agency zones
         Route::resource('zones', 'ZoneController');
 
