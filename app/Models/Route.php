@@ -84,12 +84,8 @@ class Route extends Model
 		return $this->hasMany(Trip::class);
 	}
 
-	public function getEnumTypeAttribute(){
-	    return EnumManipulation::getEnumValues('routes', 'type');
-    }
-
     public function getEnumKeyTypeAttribute(){
-        return array_keys(EnumManipulation::getEnumValues('routes', 'type'), $this->type);
+        return array_keys(EnumManipulation::getEnumValues('routes', 'type'), $this->type)[0];
     }
 
     public function getCreatedAtAttribute($value) {

@@ -67,7 +67,7 @@ class FareAttribute extends Model
     }
 
     public function getEnumKeyTransfersAttribute(){
-        return array_keys(EnumManipulation::getEnumValues('fare_attributes', 'transfers'), $this->transfers);
+        return (!empty($this->transfers) ? array_keys(EnumManipulation::getEnumValues('fare_attributes', 'transfers'), $this->transfers)[0] : null);
     }
 
     public function getCreatedAtAttribute($value) {

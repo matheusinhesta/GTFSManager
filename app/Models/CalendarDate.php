@@ -6,6 +6,7 @@
 
 namespace App\Models;
 
+use App\Traits\EnumManipulation;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -56,6 +57,10 @@ class CalendarDate extends Model
 	{
 		return $this->belongsTo(Service::class)->select(['id', 'name', 'created_at', 'updated_at']);
 	}
+
+    public function getEnumKeyExceptionTypeAttribute(){
+        return array_keys(EnumManipulation::getEnumValues('calendar_dates', 'exception_type'), $this->exception_type)[0];
+    }
 
     public function getDateAttribute($value) {
         return Carbon::createFromTimestamp(strtotime($value))->timezone(config('app.timezone'))->toDateString();

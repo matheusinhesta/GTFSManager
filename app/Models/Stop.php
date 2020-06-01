@@ -6,6 +6,7 @@
 
 namespace App\Models;
 
+use App\Traits\EnumManipulation;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -88,6 +89,10 @@ class Stop extends Model
 	{
 		return $this->hasMany(StopTime::class);
 	}
+
+    public function getEnumKeyLocationTypeAttribute(){
+        return array_keys(EnumManipulation::getEnumValues('stops', 'location_type'), $this->location_type)[0];
+    }
 
     public function getCreatedAtAttribute($value) {
         return Carbon::createFromTimestamp(strtotime($value))->timezone(config('app.timezone'))->toDateTimeString();

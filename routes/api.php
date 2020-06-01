@@ -2,10 +2,10 @@
 
 use Illuminate\Support\Facades\Route;
 
+// Public Routes
 Route::get('/', function () {
     return response()->json(['message' => 'GTFS Manager check!']);
 });
-
 
 Route::post('register', 'AuthController@register');
 Route::post('login', 'AuthController@login')->name('login');
