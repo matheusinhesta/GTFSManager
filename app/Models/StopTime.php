@@ -12,12 +12,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class StopTime
- * 
+ *
  * @property int $id
  * @property int $trip_id
  * @property int $stop_id
- * @property Carbon $arrival_time
- * @property Carbon $departure_time
+ * @property string $arrival_time
+ * @property string $departure_time
  * @property int $stop_sequence
  * @property string $stop_headsign
  * @property string $pickup_type
@@ -27,7 +27,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property string $deleted_at
- * 
+ *
  * @property Stop $stop
  * @property Trip $trip
  *
@@ -46,11 +46,6 @@ class StopTime extends Model
 		'timepoint' => 'bool'
 	];
 
-	protected $dates = [
-		'arrival_time',
-		'departure_time'
-	];
-
 	protected $fillable = [
 		'trip_id',
 		'stop_id',
@@ -66,11 +61,20 @@ class StopTime extends Model
 
 	public function stop()
 	{
-		return $this->belongsTo(Stop::class);
+		return $this->belongsTo(Stop::class)->select(['id', 'code', 'name', 'desc', 'lat', 'lon', 'zone_id', 'url', 'location_type', 'parent_station', 'timezone', 'wheelchair_boarding', 'platform_code', 'created_at', 'updated_at']);
 	}
 
 	public function trip()
 	{
-		return $this->belongsTo(Trip::class);
+		return $this->belongsTo(Trip::class)->select(['id', 'route_id', 'service_id', 'headsign', 'short_name', 'direction_id',
+            'block_id', 'wheelchair_accessible', 'bikes_allowed', 'created_at', 'updated_at']);
 	}
+
+    public function getCreatedAtAttribute($value) {
+        return Carbon::createFromTimestamp(strtotime($value))->timezone(config('app.timezone'))->toDateTimeString();
+    }
+
+    public function getUpdatedAtAttribute($value) {
+        return Carbon::createFromTimestamp(strtotime($value))->timezone(config('app.timezone'))->toDateTimeString();
+    }
 }

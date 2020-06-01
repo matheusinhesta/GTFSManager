@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class Trip
- * 
+ *
  * @property int $id
  * @property int $route_id
  * @property int $service_id
@@ -27,7 +27,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property string $deleted_at
- * 
+ *
  * @property Route $route
  * @property Service $service
  * @property Shape $shape
@@ -62,12 +62,12 @@ class Trip extends Model
 
 	public function route()
 	{
-		return $this->belongsTo(Route::class);
+		return $this->belongsTo(Route::class)->select(['id', 'short_name', 'long_name']);
 	}
 
 	public function service()
 	{
-		return $this->belongsTo(Service::class);
+		return $this->belongsTo(Service::class)->select(['id', 'name']);
 	}
 
 	public function shape()
@@ -84,4 +84,12 @@ class Trip extends Model
 	{
 		return $this->hasMany(StopTime::class);
 	}
+
+    public function getCreatedAtAttribute($value) {
+        return Carbon::createFromTimestamp(strtotime($value))->timezone(config('app.timezone'))->toDateTimeString();
+    }
+
+    public function getUpdatedAtAttribute($value) {
+        return Carbon::createFromTimestamp(strtotime($value))->timezone(config('app.timezone'))->toDateTimeString();
+    }
 }

@@ -50,6 +50,15 @@ Route::middleware(['jwt.verify'])->group(function () {
         // Agency fare rules
         Route::resource('fares/{fare_id}/rules', 'FareRuleController');
 
+        // Agency trips
+        Route::resource('trips', 'TripController');
+
+        // Agency stops
+        Route::resource('stops', 'StopController');
+
+        // Agency stop times
+        Route::resource('stop-times', 'StopTimesController');
+
         //Route::resource('agency', 'AgencyController')->only(['index', 'update']);
     });
 

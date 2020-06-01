@@ -5,9 +5,6 @@ info:
   title: "GTFS Manager"
   contact:
     email: "matheusinhesta@live.com"
-  license:
-    name: "Apache 2.0"
-    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
 basePath: "/api"
 tags:
   - name: "Auth"
@@ -26,6 +23,12 @@ tags:
     description: "Operations about agency services. Only admin user can access this routes!"
   - name: "Zones"
     description: "Operations about agency zones. Only admin user can access this routes!"
+  - name: "Trips"
+    description: "Operations about agency trips. Only admin user can access this routes!"
+  - name: "Stops"
+    description: "Operations about agency stops. Only admin user can access this routes!"
+  - name: "Stop Times"
+    description: "Operations about agency stop times. Only admin user can access this routes!"
 paths:
   #Auth Routes
   /register:
@@ -1761,6 +1764,759 @@ paths:
         "500":
           description: "An error has occurred. Check the return message and error response or error logs."
 
+  #Agency Trips
+  /trips:
+    get:
+      tags:
+        - "Trips"
+      summary: "Get agency trips"
+      description: ""
+      operationId: "trips"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Trip"
+
+    post:
+      tags:
+        - "Trips"
+      summary: "Creates a new trip for the agency"
+      description: ""
+      operationId: "tripsCreate"
+      consumes:
+        - "application/x-www-form-urlencoded"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+
+        - name: "route_id"
+          in: "formData"
+          description: "ID of specific route"
+          required: true
+          type: "integer"
+          format: "int64"
+
+        - name: "service_id"
+          in: "formData"
+          description: "ID of specific service"
+          required: true
+          type: "integer"
+          format: "int64"
+
+        - name: "direction_id"
+          in: "formData"
+          description: "Indicates the direction of travel for a trip. This field is not used in routing; it provides a way to separate trips by direction when publishing time tables. (0-going: Travel in one direction / 1-return: Travel in the opposite direction)"
+          type: "string"
+          enum: ['going', 'return']
+          required: true
+
+        - name: "headsign"
+          in: "formData"
+          description: "Text that appears on signage identifying the trip's destination to riders. Use this field to distinguish between different patterns of service on the same route. If the headsign changes during a trip, trip_headsign can be overridden by specifying values for the stop_times.headsign."
+          type: "string"
+
+        - name: "short_name"
+          in: "formData"
+          description: "Public facing text used to identify the trip to riders, for instance, to identify train numbers for commuter rail trips. If riders do not commonly rely on trip names, leave this field empty. A short_name value, if provided, should uniquely identify a trip within a service day; it should not be used for destination names or limited/express designations."
+          type: "string"
+
+        - name: "block_id"
+          in: "formData"
+          description: "Identifies the block to which the trip belongs. A block consists of a single trip or many sequential trips made using the same vehicle, defined by shared service days and block_id."
+          type: "string"
+          enum: ['going', 'return']
+
+        - name: "wheelchair_accessible"
+          in: "formData"
+          description: "Indicates wheelchair accessibility."
+          type: "string"
+          enum: ['empty', 'has', 'hasnt']
+
+        - name: "bikes_allowed"
+          in: "formData"
+          description: "	Indicates whether bikes are allowed."
+          type: "string"
+          enum: ['empty', 'has', 'hasnt']
+
+      responses:
+        "201":
+          description: "Success! The trip has been registered."
+        "400":
+          description: "Invalid input."
+        "500":
+          description: "An error has occurred. Check the return message and error response or error logs."
+
+  /trips/{trip_id}:
+    get:
+      tags:
+        - "Trips"
+      summary: "Get a specific agency trip"
+      description: ""
+      operationId: "tripInformation"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+
+        - name: "trip_id"
+          in: "path"
+          description: "ID of specific agency trip"
+          required: true
+          type: "integer"
+          format: "int64"
+
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Trip"
+        "404":
+          description: "Agency trip not found."
+
+    put:
+      tags:
+        - "Trips"
+      summary: "Updates a specific agency trip"
+      description: ""
+      operationId: "tripUpdate"
+      consumes:
+        - "application/x-www-form-urlencoded"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+
+        - name: "trip_id"
+          in: "path"
+          description: "ID of specific agency trip"
+          required: true
+          type: "integer"
+          format: "int64"
+
+        - name: "route_id"
+          in: "formData"
+          description: "ID of specific route"
+          type: "integer"
+          format: "int64"
+
+        - name: "service_id"
+          in: "formData"
+          description: "ID of specific service"
+          type: "integer"
+          format: "int64"
+
+        - name: "direction_id"
+          in: "formData"
+          description: "Indicates the direction of travel for a trip. This field is not used in routing; it provides a way to separate trips by direction when publishing time tables. (0-going: Travel in one direction / 1-return: Travel in the opposite direction)"
+          type: "string"
+          enum: ['going', 'return']
+
+        - name: "headsign"
+          in: "formData"
+          description: "Text that appears on signage identifying the trip's destination to riders. Use this field to distinguish between different patterns of service on the same route. If the headsign changes during a trip, trip_headsign can be overridden by specifying values for the stop_times.headsign."
+          type: "string"
+
+        - name: "short_name"
+          in: "formData"
+          description: "Public facing text used to identify the trip to riders, for instance, to identify train numbers for commuter rail trips. If riders do not commonly rely on trip names, leave this field empty. A short_name value, if provided, should uniquely identify a trip within a service day; it should not be used for destination names or limited/express designations."
+          type: "string"
+
+        - name: "block_id"
+          in: "formData"
+          description: "Identifies the block to which the trip belongs. A block consists of a single trip or many sequential trips made using the same vehicle, defined by shared service days and block_id."
+          type: "string"
+          enum: ['going', 'return']
+
+        - name: "wheelchair_accessible"
+          in: "formData"
+          description: "Indicates wheelchair accessibility."
+          type: "string"
+          enum: ['empty', 'has', 'hasnt']
+
+        - name: "bikes_allowed"
+          in: "formData"
+          description: "	Indicates whether bikes are allowed."
+          type: "string"
+          enum: ['empty', 'has', 'hasnt']
+
+      responses:
+        "200":
+          description: "Successful operation."
+        "400":
+          description: "Invalid input."
+        "404":
+          description: "Agency trip not found."
+        "500":
+          description: "An error has occurred. Check the return message and error response or error logs."
+
+    delete:
+      tags:
+        - "Trips"
+      summary: "Deletes a specific agency trip"
+      description: ""
+      operationId: "deleteTrip"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+
+        - name: "trip_id"
+          in: "path"
+          description: "ID of specific agency trip"
+          required: true
+          type: "integer"
+          format: "int64"
+
+      responses:
+        "200":
+          description: "Successful operation."
+        "404":
+          description: "Agency trip not found."
+        "500":
+          description: "An error has occurred. Check the return message and error response or error logs."
+
+  #Agency Stops
+  /stops:
+    get:
+      tags:
+        - "Stops"
+      summary: "Get agency stops"
+      description: ""
+      operationId: "stops"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Stop"
+
+    post:
+      tags:
+        - "Stops"
+      summary: "Creates a new stop for the agency"
+      description: ""
+      operationId: "stopsCreate"
+      consumes:
+        - "application/x-www-form-urlencoded"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+
+        - name: "zone_id"
+          in: "formData"
+          description: "Identifies the zone for a stop."
+          required: true
+          type: "integer"
+
+        - name: "name"
+          in: "formData"
+          description: "Name of the location. Use a name that people will understand in the local and tourist vernacular."
+          required: true
+          type: "string"
+
+        - name: "desc"
+          in: "formData"
+          description: "Description of the location that provides useful, quality information. Do not simply duplicate the name of the location."
+          required: true
+          type: "string"
+
+        - name: "location_type"
+          in: "formData"
+          description: "Type of the location."
+          type: "string"
+          enum: ['platform', 'station', 'entrance_exit', 'generic_node', 'boarding_area']
+          required: true
+
+        - name: "code"
+          in: "formData"
+          description: "Short text or a number that identifies the location for riders. These codes are often used in phone-based transit information systems or printed on signage to make it easier for riders to get information for a particular location."
+          type: "string"
+
+        - name: "lat"
+          in: "formData"
+          description: "Latitude of the location. Required for locations which are platform, stations or entrances/exits,"
+          type: "string"
+
+        - name: "lon"
+          in: "formData"
+          description: "Longitude of the location. Required for locations which are platform, stations or entrances/exits,"
+          type: "string"
+
+        - name: "stop_url"
+          in: "formData"
+          description: "URL of a web page about the location. This should be different from the agency.url and the routes.url field values."
+          type: "string"
+
+        - name: "parent_station"
+          in: "formData"
+          description: "Defines hierarchy between the different locations. (stops.id). Required for locations which are entrance_exit, generic_node or boarding_area."
+          type: "integer"
+
+        - name: "wheelchair_boarding"
+          in: "formData"
+          description: "Indicates whether wheelchair boardings are possible from the location."
+          type: "string"
+          enum: ['empty', 'has', 'hasnt']
+
+      responses:
+        "201":
+          description: "Success! The stop has been registered."
+        "400":
+          description: "Invalid input."
+        "500":
+          description: "An error has occurred. Check the return message and error response or error logs."
+
+  /stops/{stop_id}:
+    get:
+      tags:
+        - "Stops"
+      summary: "Get a specific agency stop"
+      description: ""
+      operationId: "stopInformation"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+
+        - name: "stop_id"
+          in: "path"
+          description: "ID of specific agency stop"
+          required: true
+          type: "integer"
+          format: "int64"
+
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Stop"
+        "404":
+          description: "Agency stop not found."
+
+    put:
+      tags:
+        - "Stops"
+      summary: "Updates a specific agency stop"
+      description: ""
+      operationId: "stopUpdate"
+      consumes:
+        - "application/x-www-form-urlencoded"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+
+        - name: "stop_id"
+          in: "path"
+          description: "ID of specific agency stop."
+          required: true
+          type: "integer"
+          format: "int64"
+
+        - name: "zone_id"
+          in: "formData"
+          description: "Identifies the zone for a stop."
+          type: "integer"
+
+        - name: "name"
+          in: "formData"
+          description: "Name of the location. Use a name that people will understand in the local and tourist vernacular."
+          type: "string"
+
+        - name: "desc"
+          in: "formData"
+          description: "Description of the location that provides useful, quality information. Do not simply duplicate the name of the location."
+          type: "string"
+
+        - name: "location_type"
+          in: "formData"
+          description: "Type of the location."
+          type: "string"
+          enum: ['platform', 'station', 'entrance_exit', 'generic_node', 'boarding_area']
+
+        - name: "code"
+          in: "formData"
+          description: "Short text or a number that identifies the location for riders. These codes are often used in phone-based transit information systems or printed on signage to make it easier for riders to get information for a particular location."
+          type: "string"
+
+        - name: "lat"
+          in: "formData"
+          description: "Latitude of the location. Required for locations which are platform, stations or entrances/exits,"
+          type: "string"
+
+        - name: "lon"
+          in: "formData"
+          description: "Longitude of the location. Required for locations which are platform, stations or entrances/exits,"
+          type: "string"
+
+        - name: "stop_url"
+          in: "formData"
+          description: "URL of a web page about the location. This should be different from the agency.url and the routes.url field values."
+          type: "string"
+
+        - name: "parent_station"
+          in: "formData"
+          description: "Defines hierarchy between the different locations. (stops.id). Required for locations which are entrance_exit, generic_node or boarding_area."
+          type: "integer"
+
+        - name: "wheelchair_boarding"
+          in: "formData"
+          description: "Indicates whether wheelchair boardings are possible from the location."
+          type: "string"
+          enum: ['empty', 'has', 'hasnt']
+
+      responses:
+        "200":
+          description: "Successful operation."
+        "400":
+          description: "Invalid input."
+        "404":
+          description: "Agency stop not found."
+        "500":
+          description: "An error has occurred. Check the return message and error response or error logs."
+
+    delete:
+      tags:
+        - "Stops"
+      summary: "Deletes a specific agency stop"
+      description: ""
+      operationId: "stopTrip"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+
+        - name: "stop_id"
+          in: "path"
+          description: "ID of specific agency stop"
+          required: true
+          type: "integer"
+          format: "int64"
+
+      responses:
+        "200":
+          description: "Successful operation."
+        "404":
+          description: "Agency stop not found."
+        "500":
+          description: "An error has occurred. Check the return message and error response or error logs."
+
+  #Agency Stops Times
+  /stop-times:
+    get:
+      tags:
+        - "Stop Times"
+      summary: "Get agency stop times"
+      description: ""
+      operationId: "stopTime"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/StopTime"
+
+    post:
+      tags:
+        - "Stop Times"
+      summary: "Creates a new stop time for the agency"
+      description: ""
+      operationId: "stopTimeCreate"
+      consumes:
+        - "application/x-www-form-urlencoded"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+
+        - name: "trip_id"
+          in: "formData"
+          description: "Identifies the trip for a stop time. (trips.id)"
+          required: true
+          type: "integer"
+
+        - name: "stop_id"
+          in: "formData"
+          description: "Identifies the stop. (stops.id)"
+          required: true
+          type: "integer"
+
+        - name: "stop_sequence"
+          in: "formData"
+          description: "Order of stops for a particular trip. The values must increase along the trip but do not need to be consecutive."
+          required: true
+          type: "integer"
+
+        - name: "arrival_time"
+          in: "formData"
+          description: "Arrival time at a specific stop for a specific trip on a route. If there are not separate times for arrival and departure at a stop, enter the same value for arrival_time and departure_time. For times occurring after midnight on the service day, enter the time as a value greater than 24:00:00 in HH:MM:SS local time for the day on which the trip schedule begins. Required if timepoint is true (1)."
+          type: "string"
+
+        - name: "departure_time"
+          in: "formData"
+          description: "Departure time from a specific stop for a specific trip on a route. For times occurring after midnight on the service day, enter the time as a value greater than 24:00:00 in HH:MM:SS local time for the day on which the trip schedule begins. If there are not separate times for arrival and departure at a stop, enter the same value for arrival_time and departure_time. Required if timepoint is true (1)."
+          type: "string"
+
+        - name: "stop_headsign"
+          in: "formData"
+          description: "Text that appears on signage identifying the trip's destination to riders."
+          type: "string"
+
+        - name: "pickup_type"
+          in: "formData"
+          description: "Indicates pickup method."
+          type: "string"
+          enum: ['regular', 'hasnt', 'call', 'combine']
+
+        - name: "drop_off_type"
+          in: "formData"
+          description: "Indicates drop off method."
+          type: "string"
+          enum: ['regular', 'hasnt', 'call', 'combine']
+
+        - name: "timepoint"
+          in: "formData"
+          description: "Indicates if arrival and departure times for a stop are strictly adhered to by the vehicle or if they are instead approximate and/or interpolated times. This field allows a GTFS producer to provide interpolated stop-times, while indicating that the times are approximate (0-Times are considered approximate / 1-Times are considered exact)."
+          type: "boolean"
+
+      responses:
+        "201":
+          description: "Success! The stop time has been registered."
+        "400":
+          description: "Invalid input."
+        "500":
+          description: "An error has occurred. Check the return message and error response or error logs."
+
+  /stop-times/{stop_time_id}:
+    get:
+      tags:
+        - "Stop Times"
+      summary: "Get a specific agency stop time"
+      description: ""
+      operationId: "stopTimeInformation"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+
+        - name: "stop_time_id"
+          in: "path"
+          description: "ID of specific agency stop tinme"
+          required: true
+          type: "integer"
+          format: "int64"
+
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/StopTime"
+        "404":
+          description: "Agency stop time not found."
+
+    put:
+      tags:
+        - "Stop Times"
+      summary: "Updates a specific agency stop time"
+      description: ""
+      operationId: "stopTimeUpdate"
+      consumes:
+        - "application/x-www-form-urlencoded"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+
+        - name: "stop_time_id"
+          in: "path"
+          description: "ID of specific agency stop."
+          required: true
+          type: "integer"
+          format: "int64"
+
+        - name: "trip_id"
+          in: "formData"
+          description: "Identifies the trip for a stop time. (trips.id)"
+          type: "integer"
+
+        - name: "stop_id"
+          in: "formData"
+          description: "Identifies the stop. (stops.id)"
+          type: "integer"
+
+        - name: "stop_sequence"
+          in: "formData"
+          description: "Order of stops for a particular trip. The values must increase along the trip but do not need to be consecutive."
+          type: "integer"
+
+        - name: "arrival_time"
+          in: "formData"
+          description: "Arrival time at a specific stop for a specific trip on a route. If there are not separate times for arrival and departure at a stop, enter the same value for arrival_time and departure_time. For times occurring after midnight on the service day, enter the time as a value greater than 24:00:00 in HH:MM:SS local time for the day on which the trip schedule begins. Required if timepoint is true (1)."
+          type: "string"
+
+        - name: "departure_time"
+          in: "formData"
+          description: "Departure time from a specific stop for a specific trip on a route. For times occurring after midnight on the service day, enter the time as a value greater than 24:00:00 in HH:MM:SS local time for the day on which the trip schedule begins. If there are not separate times for arrival and departure at a stop, enter the same value for arrival_time and departure_time. Required if timepoint is true (1)."
+          type: "string"
+
+        - name: "stop_headsign"
+          in: "formData"
+          description: "Text that appears on signage identifying the trip's destination to riders."
+          type: "string"
+
+        - name: "pickup_type"
+          in: "formData"
+          description: "Indicates pickup method."
+          type: "string"
+          enum: ['regular', 'hasnt', 'call', 'combine']
+
+        - name: "drop_off_type"
+          in: "formData"
+          description: "Indicates drop off method."
+          type: "string"
+          enum: ['regular', 'hasnt', 'call', 'combine']
+
+        - name: "timepoint"
+          in: "formData"
+          description: "Indicates if arrival and departure times for a stop are strictly adhered to by the vehicle or if they are instead approximate and/or interpolated times. This field allows a GTFS producer to provide interpolated stop-times, while indicating that the times are approximate (0-Times are considered approximate / 1-Times are considered exact)."
+          type: "boolean"
+
+      responses:
+        "200":
+          description: "Successful operation."
+        "400":
+          description: "Invalid input."
+        "404":
+          description: "Agency stop time not found."
+        "500":
+          description: "An error has occurred. Check the return message and error response or error logs."
+
+    delete:
+      tags:
+        - "Stop Times"
+      summary: "Deletes a specific agency stop time"
+      description: ""
+      operationId: "stopTimeTrip"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+
+        - name: "stop_time_id"
+          in: "path"
+          description: "ID of specific agency stop time"
+          required: true
+          type: "integer"
+          format: "int64"
+
+      responses:
+        "200":
+          description: "Successful operation."
+        "404":
+          description: "Agency stop time not found."
+        "500":
+          description: "An error has occurred. Check the return message and error response or error logs."
+
 definitions:
   User:
     type: "object"
@@ -1896,19 +2652,94 @@ definitions:
       name:
         type: "string"
     xml:
-      name: "Service"
+      name: "Zone"
 
-
-  ApiResponse:
+  Trip:
     type: "object"
     properties:
-      code:
+      id:
         type: "integer"
-        format: "int32"
-      type:
+      route_id:
+        type: "integer"
+      service_id:
+        type: "integer"
+      headsign:
         type: "string"
-      message:
+      short_name:
         type: "string"
+      direction_id:
+        type: "string"
+        enum: ['going', 'return']
+      block_id:
+        type: "integer"
+      wheelchair_accessible:
+        type: "string"
+        enum: ['empty', 'has', 'hasnt']
+      bikes_allowed:
+        type: "string"
+        enum: ['empty', 'has', 'hasnt']
+    xml:
+      name: "Trip"
+
+  Stop:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+      zone_id:
+        type: "integer"
+      name:
+        type: "string"
+      desc:
+        type: "string"
+      code:
+        type: "string"
+      lat:
+        type: "string"
+      lon:
+        type: "string"
+      stop_url:
+        type: "string"
+      location_type:
+        type: "string"
+        enum: ['platform', 'station', 'io', 'generic_node', 'boarding_area']
+      parent_station:
+        type: "integer"
+      wheelchair_boarding:
+        type: "string"
+        enum: ['empty', 'has', 'hasnt']
+    xml:
+      name: "Stop"
+
+  StopTime:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+      trip_id:
+        type: "integer"
+      stop_id:
+        type: "integer"
+      arrival_time:
+        type: "string"
+      departure_time:
+        type: "string"
+      stop_sequence:
+        type: "integer"
+      stop_headsign:
+        type: "string"
+      pickup_type:
+        type: "string"
+        enum: ['regular', 'hasnt', 'call', 'combine']
+      drop_off_type:
+        type: "string"
+        enum: ['regular', 'hasnt', 'call', 'combine']
+      timepoint:
+        type: "boolean"
+    xml:
+      name: "StopTime"
+
+
 externalDocs:
   description: "Find out more about Swagger"
   url: "http://swagger.io"

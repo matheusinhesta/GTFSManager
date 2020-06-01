@@ -22,7 +22,7 @@ class CreateStopsTable extends Migration
             $table->string('lon')->nullable();
             $table->unsignedBigInteger('zone_id');
             $table->string('url')->nullable();
-            $table->enum('location_type', ['platform', 'station', 'io', 'generic_node', 'boarding_area'])->nullable();
+            $table->enum('location_type', ['platform', 'station', 'entrance_exit', 'generic_node', 'boarding_area'])->nullable();
             $table->integer('parent_station')->nullable();
             $table->string('timezone')->nullable();
             $table->enum('wheelchair_boarding', ['empty', 'has', 'hasnt'])->nullable();

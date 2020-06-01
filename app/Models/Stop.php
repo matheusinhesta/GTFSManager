@@ -13,8 +13,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class Stop
- * 
+ *
  * @property int $id
+ * @property int $agency_id
  * @property string $code
  * @property string $name
  * @property string $desc
@@ -31,7 +32,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property string $deleted_at
- * 
+ *
+ * @property Agency $agency
  * @property Zone $zone
  * @property Collection|EntitySelector[] $entity_selectors
  * @property Collection|StopTime[] $stop_times
@@ -44,12 +46,14 @@ class Stop extends Model
 	protected $table = 'stops';
 
 	protected $casts = [
+		'agency_id' => 'int',
 		'zone_id' => 'int',
 		'parent_station' => 'int',
 		'level_id' => 'int'
 	];
 
 	protected $fillable = [
+		'agency_id',
 		'code',
 		'name',
 		'desc',
@@ -65,9 +69,14 @@ class Stop extends Model
 		'platform_code'
 	];
 
+	public function agency()
+	{
+		return $this->belongsTo(Agency::class);
+	}
+
 	public function zone()
 	{
-		return $this->belongsTo(Zone::class);
+		return $this->belongsTo(Zone::class)->select(['id', 'name']);
 	}
 
 	public function entity_selectors()
@@ -79,4 +88,12 @@ class Stop extends Model
 	{
 		return $this->hasMany(StopTime::class);
 	}
+
+    public function getCreatedAtAttribute($value) {
+        return Carbon::createFromTimestamp(strtotime($value))->timezone(config('app.timezone'))->toDateTimeString();
+    }
+
+    public function getUpdatedAtAttribute($value) {
+        return Carbon::createFromTimestamp(strtotime($value))->timezone(config('app.timezone'))->toDateTimeString();
+    }
 }
