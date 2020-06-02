@@ -23,10 +23,12 @@ class CreateTripUpdateTable extends Migration
             $table->softDeletes();
 
             $table->foreign('trip_descriptor_id')
-                ->references('id')->on('trip_descriptor');
+                ->references('id')->on('trip_descriptor')
+                ->onUpdate('cascade');
 
             $table->foreign('stop_time_update_id')
-                ->references('id')->on('stop_time_update');
+                ->references('id')->on('stop_time_update')
+                ->onUpdate('cascade');
         });
     }
 

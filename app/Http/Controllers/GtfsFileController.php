@@ -120,7 +120,7 @@ class GtfsFileController extends Controller {
     }
 
 
-    private function clearString($str, $arquivo = null) {
+    private function clearString($str) {
         $str = preg_replace('/[áàãâä]/ui', 'a', $str);
         $str = preg_replace('/[éèêë]/ui', 'e', $str);
         $str = preg_replace('/[íìîï]/ui', 'i', $str);

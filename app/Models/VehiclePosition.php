@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class VehiclePosition
- * 
+ *
  * @property int $id
  * @property int $trip_descriptor_id
  * @property int $vehicle_id
@@ -22,14 +22,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property float $odometer
  * @property float $speed
  * @property int $current_stop_sequence
- * @property int $stop_id
  * @property string $current_status
  * @property string $congestion_level
  * @property string $occupancy_status
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property string $deleted_at
- * 
+ *
  * @property TripDescriptor $trip_descriptor
  * @property VehicleDescriptor $vehicle_descriptor
  *
@@ -48,8 +47,7 @@ class VehiclePosition extends Model
 		'bearing' => 'float',
 		'odometer' => 'float',
 		'speed' => 'float',
-		'current_stop_sequence' => 'int',
-		'stop_id' => 'int'
+		'current_stop_sequence' => 'int'
 	];
 
 	protected $fillable = [
@@ -61,7 +59,6 @@ class VehiclePosition extends Model
 		'odometer',
 		'speed',
 		'current_stop_sequence',
-		'stop_id',
 		'current_status',
 		'congestion_level',
 		'occupancy_status'
@@ -76,4 +73,12 @@ class VehiclePosition extends Model
 	{
 		return $this->belongsTo(VehicleDescriptor::class, 'vehicle_id');
 	}
+
+    public function getCreatedAtAttribute($value) {
+        return Carbon::createFromTimestamp(strtotime($value))->timezone(config('app.timezone'))->toDateTimeString();
+    }
+
+    public function getUpdatedAtAttribute($value) {
+        return Carbon::createFromTimestamp(strtotime($value))->timezone(config('app.timezone'))->toDateTimeString();
+    }
 }

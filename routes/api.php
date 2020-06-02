@@ -59,7 +59,23 @@ Route::middleware(['jwt.verify'])->group(function () {
         // Agency stop times
         Route::resource('stop-times', 'StopTimesController');
 
-        //Route::resource('agency', 'AgencyController')->only(['index', 'update']);
+
+        // ------------ sem documentação
+        // Agency vehicles
+        Route::resource('vehicles', 'VehicleController');
+
+        Route::get('completed-trips', 'TripDescriptorController@completedTrips');
+        Route::resource('trips-in-progress', 'TripDescriptorController');
+
+    });
+
+    // ------------ sem documentação
+    Route::prefix('driver')->group(function(){
+        Route::get('trips-to-start', 'DriverController@tripsToStart');
+        Route::post('start-trip', 'DriverController@startTrip');
+        Route::post('stop-trip', 'DriverController@stopTrip');
+        Route::post('cancel-trip', 'DriverController@cancelTrip');
+        Route::post('realtime-position', 'DriverController@realtimePosition');
     });
 
 });
