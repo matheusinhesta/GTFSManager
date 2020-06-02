@@ -6,6 +6,7 @@
 
 namespace App\Models;
 
+use App\Traits\EnumManipulation;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -84,6 +85,10 @@ class Trip extends Model
 	{
 		return $this->hasMany(StopTime::class);
 	}
+
+    public function getEnumKeyDirectionIdAttribute(){
+        return array_keys(EnumManipulation::getEnumValues('trips', 'direction_id'), $this->direction_id)[0];
+    }
 
     public function getCreatedAtAttribute($value) {
         return Carbon::createFromTimestamp(strtotime($value))->timezone(config('app.timezone'))->toDateTimeString();

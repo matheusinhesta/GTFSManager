@@ -86,7 +86,7 @@ class StopController extends Controller {
             'desc'                  => 'string|min:0',
             'code'                  => 'string|min:0',
             'lat'                   => 'required_if:location_type,platform,station,entrance_exit|string|min:0',
-            'long'                  => 'required_if:location_type,platform,station,entrance_exit|string|min:0',
+            'lon'                  => 'required_if:location_type,platform,station,entrance_exit|string|min:0',
             'zone_id'               => ['integer', Rule::in(Zone::where('agency_id', \Auth::user()->agency_id)->pluck('id'))],
             'stop_url'              => 'string|min:0',
             'location_type'         => [Rule::in(['platform', 'station', 'io', 'generic_node', 'boarding_area'])],
