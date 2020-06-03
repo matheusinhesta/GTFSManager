@@ -11,7 +11,7 @@ Route::post('register', 'AuthController@register');
 Route::post('login', 'AuthController@login')->name('login');
 Route::post('forget-password', 'AuthController@forgetPassword');
 
-// sem documentação
+// Realtime
 Route::get('agency/{agency_id}/next-trips', 'RealtimeTripsController@nextTrips');
 Route::get('agency/{agency_id}/realtime-trip/{trip_descriptor_id}', 'RealtimeTripsController@realtimeTrip');
 
@@ -63,8 +63,6 @@ Route::middleware(['jwt.verify'])->group(function () {
         // Agency stop times
         Route::resource('stop-times', 'StopTimesController');
 
-
-        // ------------ sem documentação
         // Agency vehicles
         Route::resource('vehicles', 'VehicleController');
 
@@ -73,7 +71,7 @@ Route::middleware(['jwt.verify'])->group(function () {
 
     });
 
-    // ------------ sem documentação
+    // Driver routes
     Route::prefix('driver')->group(function(){
         Route::get('trips-to-start', 'DriverController@tripsToStart');
         Route::post('start-trip', 'DriverController@startTrip');

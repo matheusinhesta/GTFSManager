@@ -9,26 +9,53 @@ basePath: "/api"
 tags:
   - name: "Auth"
     description: "Everything about authentication on API"
+
   - name: "Agency"
     description: "Everything about agency informations"
-  - name: "Users"
-    description: "Operations about user. Only admin user can access this routes!"
+
   - name: "Calendar Dates"
     description: "Operations about agency calendar dates. Only admin user can access this routes!"
+
+  - name: "Driver"
+    description: "Driver-related operations. Only drivers can access this route!"
+
   - name: "Fares"
     description: "Operations about agency fares and fare rules. Only admin user can access this routes!"
+
+  - name: "GTFS Files"
+    description: "Download the feed in text files from the specified agency. Public route!"
+
+  - name: "Realtime Trips"
+    description: "Operations on real-time monitoring of a specific trip. No authentication is required!"
+
   - name: "Routes"
     description: "Operations about agency routes. Only admin user can access this routes!"
+
   - name: "Services"
     description: "Operations about agency services. Only admin user can access this routes!"
-  - name: "Zones"
-    description: "Operations about agency zones. Only admin user can access this routes!"
-  - name: "Trips"
-    description: "Operations about agency trips. Only admin user can access this routes!"
+
   - name: "Stops"
     description: "Operations about agency stops. Only admin user can access this routes!"
+
   - name: "Stop Times"
     description: "Operations about agency stop times. Only admin user can access this routes!"
+
+  - name: "Trips"
+    description: "Operations about agency trips. Only admin user can access this routes!"
+
+  - name: "Trips In Progress"
+    description: "Operations about agency trips in progress. Only admin user can access this routes!"
+
+  - name: "Users"
+    description: "Operations about user. Only admin user can access this routes!"
+
+  - name: "Vehicles"
+    description: "Operations about agency vehicles. Only admin user can access this routes!"
+
+  - name: "Zones"
+    description: "Operations about agency zones. Only admin user can access this routes!"
+
+
 paths:
   #Auth Routes
   /register:
@@ -1852,7 +1879,7 @@ paths:
 
         - name: "bikes_allowed"
           in: "formData"
-          description: "	Indicates whether bikes are allowed."
+          description: "  Indicates whether bikes are allowed."
           type: "string"
           enum: ['empty', 'has', 'hasnt']
 
@@ -1965,7 +1992,7 @@ paths:
 
         - name: "bikes_allowed"
           in: "formData"
-          description: "	Indicates whether bikes are allowed."
+          description: "  Indicates whether bikes are allowed."
           type: "string"
           enum: ['empty', 'has', 'hasnt']
 
@@ -2517,6 +2544,672 @@ paths:
         "500":
           description: "An error has occurred. Check the return message and error response or error logs."
 
+  #Agency Vehicles
+  /vehicles:
+    get:
+      tags:
+        - "Vehicles"
+      summary: "Get agency vehicles"
+      description: ""
+      operationId: "vehicles"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/VehicleDescriptor"
+
+    post:
+      tags:
+        - "Vehicles"
+      summary: "Creates a new vehicle for the agency"
+      description: ""
+      operationId: "vehicleCreate"
+      consumes:
+        - "application/x-www-form-urlencoded"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+
+        - name: "label"
+          in: "formData"
+          description: "Vehicle visible label, i.e., something that must be shown to the passenger to help identify the correct vehicle."
+          required: true
+          type: "string"
+
+        - name: "license_plate"
+          in: "formData"
+          description: "The license plate of the vehicle."
+          required: true
+          type: "string"
+
+      responses:
+        "201":
+          description: "Success! The vehicle time has been registered."
+        "400":
+          description: "Invalid input."
+        "500":
+          description: "An error has occurred. Check the return message and error response or error logs."
+
+  /vehicles/{vehicle_id}:
+    get:
+      tags:
+        - "Vehicles"
+      summary: "Get a specific agency vehicle"
+      description: ""
+      operationId: "vehicleInformation"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+
+        - name: "vehicle_id"
+          in: "path"
+          description: "ID of specific agency vehicle"
+          required: true
+          type: "integer"
+          format: "int64"
+
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/VehicleDescriptor"
+        "404":
+          description: "Agency vehicle not found."
+
+    put:
+      tags:
+        - "Vehicles"
+      summary: "Updates a specific agency vehicle"
+      description: ""
+      operationId: "vehicleUpdate"
+      consumes:
+        - "application/x-www-form-urlencoded"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+
+        - name: "vehicle_id"
+          in: "path"
+          description: "ID of specific agency vehicle."
+          required: true
+          type: "integer"
+          format: "int64"
+
+        - name: "label"
+          in: "formData"
+          description: "  User visible label, i.e., something that must be shown to the passenger to help identify the correct vehicle."
+          required: true
+          type: "string"
+
+        - name: "license_plate"
+          in: "formData"
+          description: "The license plate of the vehicle."
+          required: true
+          type: "string"
+
+      responses:
+        "200":
+          description: "Successful operation."
+        "400":
+          description: "Invalid input."
+        "404":
+          description: "Agency vehicle time not found."
+        "500":
+          description: "An error has occurred. Check the return message and error response or error logs."
+
+    delete:
+      tags:
+        - "Vehicles"
+      summary: "Deletes a specific agency vehicle"
+      description: ""
+      operationId: "vehicleTrip"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+
+        - name: "vehicle_id"
+          in: "path"
+          description: "ID of specific agency vehicle"
+          required: true
+          type: "integer"
+          format: "int64"
+
+      responses:
+        "200":
+          description: "Successful operation."
+        "404":
+          description: "Agency vehicle not found."
+        "500":
+          description: "An error has occurred. Check the return message and error response or error logs."
+
+  #Agency Trips In Progress
+  /trips-in-progress:
+    get:
+      tags:
+        - "Trips In Progress"
+      summary: "Get agency trips in progress"
+      description: ""
+      operationId: "tripsInProgress"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/TripDescriptor"
+
+    post:
+      tags:
+        - "Trips In Progress"
+      summary: "Creates a new trip for the agency"
+      description: ""
+      operationId: "tripsInProgressCreate"
+      consumes:
+        - "application/x-www-form-urlencoded"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+
+        - name: "route_id"
+          in: "formData"
+          description: "ID of specific route."
+          required: true
+          type: "integer"
+
+        - name: "trip_id"
+          in: "formData"
+          description: "ID of specific trip."
+          required: true
+          type: "integer"
+
+        - name: "user_id"
+          in: "formData"
+          description: "ID of specific user driver."
+          required: true
+          type: "integer"
+
+
+        - name: "vehicle_id"
+          in: "formData"
+          description: "ID of specific vehicle."
+          required: true
+          type: "integer"
+
+        - name: "start_time"
+          in: "formData"
+          description: "The initially scheduled start time of this trip instance. The field type Time defines the format of this field, for example 11:15:35 or 25:15:35."
+          required: true
+          type: "string"
+
+        - name: "start_date"
+          in: "formData"
+          description: "The start date of this trip instance in YYYY-MM-DD format."
+          required: true
+          type: "string"
+
+        - name: "end_time"
+          in: "formData"
+          description: "The end time of this trip instance. The field type Time defines the format of this field, for example 11:15:35 or 25:15:35."
+          required: true
+          type: "string"
+
+        - name: "end_date"
+          in: "formData"
+          description: "The end date of this trip instance in YYYY-MM-DD format."
+          required: true
+          type: "string"
+
+      responses:
+        "201":
+          description: "Success! The trip has been registered."
+        "400":
+          description: "Invalid input."
+        "500":
+          description: "An error has occurred. Check the return message and error response or error logs."
+
+  /trips-in-progress/{trip_descriptor_id}:
+    get:
+      tags:
+        - "Trips In Progress"
+      summary: "Get a specific agency scheduled trip"
+      description: ""
+      operationId: "tripsInProgressInformation"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+
+        - name: "trip_descriptor_id"
+          in: "path"
+          description: "ID of specific agency scheduled trip"
+          required: true
+          type: "integer"
+          format: "int64"
+
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/TripDescriptor"
+        "404":
+          description: "Agency scheduled trip not found."
+
+    put:
+      tags:
+        - "Trips In Progress"
+      summary: "Updates a specific agency scheduled trip"
+      description: ""
+      operationId: "tripsInProgressUpdate"
+      consumes:
+        - "application/x-www-form-urlencoded"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+
+        - name: "trip_descriptor_id"
+          in: "path"
+          description: "ID of specific agency scheduled trip"
+          required: true
+          type: "integer"
+          format: "int64"
+
+        - name: "route_id"
+          in: "formData"
+          description: "ID of specific route."
+          required: true
+          type: "integer"
+
+        - name: "trip_id"
+          in: "formData"
+          description: "ID of specific trip."
+          required: true
+          type: "integer"
+
+        - name: "user_id"
+          in: "formData"
+          description: "ID of specific user driver."
+          required: true
+          type: "integer"
+
+
+        - name: "vehicle_id"
+          in: "formData"
+          description: "ID of specific vehicle."
+          required: true
+          type: "integer"
+
+        - name: "start_time"
+          in: "formData"
+          description: "The initially scheduled start time of this trip instance. The field type Time defines the format of this field, for example 11:15:35 or 25:15:35."
+          required: true
+          type: "string"
+
+        - name: "start_date"
+          in: "formData"
+          description: "The start date of this trip instance in YYYY-MM-DD format."
+          required: true
+          type: "string"
+
+        - name: "end_time"
+          in: "formData"
+          description: "The end time of this trip instance. The field type Time defines the format of this field, for example 11:15:35 or 25:15:35."
+          required: true
+          type: "string"
+
+        - name: "end_date"
+          in: "formData"
+          description: "The end date of this trip instance in YYYY-MM-DD format."
+          required: true
+          type: "string"
+
+      responses:
+        "200":
+          description: "Successful operation."
+        "400":
+          description: "Invalid input."
+        "404":
+          description: "Agency scheduled trip not found."
+        "500":
+          description: "An error has occurred. Check the return message and error response or error logs."
+
+    delete:
+      tags:
+        - "Trips In Progress"
+      summary: "Deletes a specific agency scheduled trip"
+      description: ""
+      operationId: "tripsInProgressDelete"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+
+        - name: "trip_descriptor_id"
+          in: "path"
+          description: "ID of specific agency scheduled trip"
+          required: true
+          type: "integer"
+          format: "int64"
+
+      responses:
+        "200":
+          description: "Successful operation."
+        "404":
+          description: "Agency scheduled trip not found."
+        "500":
+          description: "An error has occurred. Check the return message and error response or error logs."
+
+  #Agency Driver
+  /driver/trips-to-start:
+    get:
+      tags:
+        - "Driver"
+      summary: "Get driver trips to start"
+      description: ""
+      operationId: "DriverTripsToStart"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/TripDescriptor"
+
+  /driver/start-trip:
+    post:
+      tags:
+        - "Driver"
+      summary: "Starts a new scheduled trip for the agency"
+      description: ""
+      operationId: "driverStartTrip"
+      consumes:
+        - "application/x-www-form-urlencoded"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+
+        - name: "trip_id"
+          in: "formData"
+          description: "ID of specific scheduled trip."
+          required: true
+          type: "integer"
+
+      responses:
+        "200":
+          description: "Success! The scheduled trip has been started."
+        "400":
+          description: "Invalid input."
+        "500":
+          description: "An error has occurred. Check the return message and error response or error logs."
+
+  /driver/stop-trip:
+    post:
+      tags:
+        - "Driver"
+      summary: "Stops a agency scheduled trip"
+      description: ""
+      operationId: "driverStopTrip"
+      consumes:
+        - "application/x-www-form-urlencoded"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+
+        - name: "trip_id"
+          in: "formData"
+          description: "ID of specific scheduled trip."
+          required: true
+          type: "integer"
+
+      responses:
+        "200":
+          description: "Success! The scheduled trip has been stoped."
+        "400":
+          description: "Invalid input."
+        "500":
+          description: "An error has occurred. Check the return message and error response or error logs."
+
+  /driver/cancel-trip:
+    post:
+      tags:
+        - "Driver"
+      summary: "Cancel a agency scheduled trip"
+      description: ""
+      operationId: "driverCancelTrip"
+      consumes:
+        - "application/x-www-form-urlencoded"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+
+        - name: "trip_id"
+          in: "formData"
+          description: "ID of specific scheduled trip."
+          required: true
+          type: "integer"
+
+      responses:
+        "200":
+          description: "Success! The scheduled trip has been canceled."
+        "400":
+          description: "Invalid input."
+        "500":
+          description: "An error has occurred. Check the return message and error response or error logs."
+
+  /driver/realtime-position:
+    post:
+      tags:
+        - "Driver"
+      summary: "Record the current vehicle position in progress"
+      description: ""
+      operationId: "driverRealtimePosition"
+      consumes:
+        - "application/x-www-form-urlencoded"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Access token"
+          required: true
+          type: "string"
+          format: "Bearer JWT token"
+
+        - name: "trip_in_course_id"
+          in: "formData"
+          description: "ID of specific scheduled trip in progress."
+          required: true
+          type: "integer"
+
+        - name: "lat"
+          in: "formData"
+          description: "Degrees North, in the WGS-84 coordinate system. Ex: -21.784913"
+          required: true
+          type: "string"
+
+        - name: "lon"
+          in: "formData"
+          description: "  Degrees East, in the WGS-84 coordinate system. Ex: -46.586383"
+          required: true
+          type: "string"
+
+      responses:
+        "200":
+          description: "Success! Position registred."
+        "400":
+          description: "Invalid input."
+        "500":
+          description: "An error has occurred. Check the return message and error response or error logs."
+
+  #Agency GTFS feed files
+  /agency/{agency_id}/gtfs:
+    get:
+      tags:
+        - "GTFS Files"
+      summary: "Get feed gtfs files from agency"
+      description: ""
+      operationId: "gtfsFiles"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "agency_id"
+          in: "path"
+          description: "ID of specific agency"
+          required: true
+          type: "integer"
+      responses:
+        "200":
+          description: "Successful operation! The gtfs files in the feed were downloaded in a .zip file."
+
+  #Realtime monitoring
+  /agency/{agency_id}/next-trips:
+    get:
+      tags:
+        - "Realtime Trips"
+      summary: "Recover the next trips from that agency of the current day with 15 minutes of tolerance."
+      description: ""
+      operationId: "realtimeNexTrips"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "agency_id"
+          in: "path"
+          description: "ID of specific agency"
+          required: true
+          type: "integer"
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/TripDescriptor"
+
+  /agency/{agency_id}/realtime-trip/{trip_descriptor_id}:
+    get:
+      tags:
+        - "Realtime Trips"
+      summary: "Real-time tracking of a specific agency trip and current vehicle position."
+      description: ""
+      operationId: "realtimeTrip"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "agency_id"
+          in: "path"
+          description: "ID of specific agency"
+          required: true
+          type: "integer"
+
+        - name: "trip_descriptor_id"
+          in: "path"
+          description: "ID of specific agency"
+          required: true
+          type: "integer"
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/TripDescriptor"
+
 definitions:
   User:
     type: "object"
@@ -2739,6 +3432,44 @@ definitions:
     xml:
       name: "StopTime"
 
+  VehicleDescriptor:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+      label:
+        type: "string"
+      license_plate:
+        type: "string"
+    xml:
+      name: "VehicleDescriptor"
+
+  TripDescriptor:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+      user_id:
+        type: "integer"
+      trip_id:
+        type: "integer"
+      route_id:
+        type: "integer"
+      trip_status:
+        type: "string"
+        enum: ['scheduled', 'started', 'canceled', 'closed']
+      start_date:
+        type: "string"
+      start_time:
+        type: "string"
+      end_date:
+        type: "string"
+      end_time:
+        type: "string"
+      license_plate:
+        type: "string"
+    xml:
+      name: "TripDescriptor"
 
 externalDocs:
   description: "Find out more about Swagger"

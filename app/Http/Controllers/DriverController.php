@@ -108,7 +108,6 @@ class DriverController extends Controller {
                 'vehicle_id'         => $trip->trip_updates->first()->vehicle_id
             ]));
 
-            // dispach função que insere no stop_time_update e atualiza o trip_update
             UpdateTripDescriptor::dispatch($trip, $vehicle_position);
 
         } catch (\Exception $e){
