@@ -101,7 +101,7 @@ class TripDescriptor extends Model
 
     public function trip()
     {
-        return $this->belongsTo(Trip::class)->select(['id', 'headsign', 'short_name', 'direction_id']);
+        return $this->belongsTo(Trip::class)->select(['id', 'headsign', 'short_name', 'direction_id', 'service_id']);
     }
 
     public function getCurrentPositionAttribute(){

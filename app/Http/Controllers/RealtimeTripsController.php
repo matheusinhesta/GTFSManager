@@ -29,7 +29,10 @@ class RealtimeTripsController extends Controller {
     public function realtimeTrip($agency_id, $trip_descriptor_id, Request $request){
         Agency::findOrFail($agency_id);
         $routes_id       = Route::where('agency_id', $agency_id)->pluck('id');
-        $trip_descriptor = TripDescriptor::with('user', 'user.user_type', 'trip')->with('route')
+        $trip_descriptor = TripDescriptor::with('user', 'user.user_type', 'trip', 'trip.service', 'route')
+                                    ->with(['route.fare_rules' => function($q){
+                                        $q->first();
+                                    }])
                                     ->with(['vehicle_positions' => function($q) use ($request){
                                         if($request->limit)
                                             $q->limit($request->limit);
