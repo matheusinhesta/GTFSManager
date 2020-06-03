@@ -20,7 +20,7 @@ class RealtimeTripsController extends Controller {
                                     ->orderBy('start_date')->orderBy('start_time')
                                     ->get(['id', 'user_id', 'trip_id', 'route_id', 'trip_status', 'start_date', 'start_time', 'end_date', 'end_time', 'created_at', 'updated_at']);
 
-        $trips_descriptors->each->setAppends(['nearby_stop', 'next_stop']);
+        $trips_descriptors->each->setAppends(['nearby_stop', 'next_stop', 'vehicle_informations']);
 
         return response()->json(compact('trips_descriptors'), 200);
     }
@@ -38,7 +38,7 @@ class RealtimeTripsController extends Controller {
                                     ->whereIn('route_id', $routes_id)->whereIn('trip_status', ['scheduled', 'started', 'canceled'])
                                     ->findOrFail($trip_descriptor_id);
 
-        $trip_descriptor->setAppends(['nearby_stop', 'next_stop', 'current_position']);
+        $trip_descriptor->setAppends(['nearby_stop', 'next_stop', 'current_position', 'vehicle_informations']);
 
         return response()->json(compact('trip_descriptor'), 200);
     }

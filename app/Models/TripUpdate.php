@@ -58,4 +58,8 @@ class TripUpdate extends Model
 	{
 		return $this->belongsTo(TripDescriptor::class);
 	}
+
+	public function vehicle(){
+	    return $this->belongsTo(VehicleDescriptor::class, 'vehicle_id');
+    }
 }
