@@ -43,7 +43,8 @@ class TripDescriptor extends Model
 
 	protected $appends = [
 	    'current_position',
-        'current_stop'
+        'nearby_stop',
+        'next_stop'
     ];
 
 	protected $casts = [
@@ -106,8 +107,12 @@ class TripDescriptor extends Model
 	    return (!empty($this->vehicle_positions->first()) ? $this->vehicle_positions()->select(['lat', 'lon', 'created_at'])->get()->first() : null);
     }
 
-    public function getCurrentStopAttribute(){
-        return (!empty($this->trip_updates->first()) ? $this->trip_updates->first()->stop_time_update->stop()->get(['id', 'name']) : null);
+    public function getNearbyStopAttribute(){
+        return (!empty($this->trip_updates->first()) ? $this->trip_updates->first()->stop_time_update->stop()->get(['id', 'name', 'lat', 'lon']) : null);
+    }
+
+    public function getNextStopAttribute(){
+	    return (!empty($this->trip_updates->first()) ? (!empty(StopTime::where('trip_id', $this->trip_id)->where('stop_sequence', $this->trip_updates->first()->stop_time_update->stop_sequence + 1)->first())) ? StopTime::where('trip_id', $this->trip_id)->where('stop_sequence', $this->trip_updates->first()->stop_time_update->stop_sequence + 1)->first()->stop()->select(['id', 'name', 'lat', 'lon'])->get() : 'End Line' : null);
     }
 
     public function getCreatedAtAttribute($value) {
