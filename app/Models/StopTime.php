@@ -16,8 +16,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property int $id
  * @property int $trip_id
  * @property int $stop_id
- * @property string $arrival_time
- * @property string $departure_time
+ * @property Carbon $arrival_time
+ * @property Carbon $departure_time
  * @property int $stop_sequence
  * @property string $stop_headsign
  * @property string $pickup_type
@@ -61,7 +61,7 @@ class StopTime extends Model
 
 	public function stop()
 	{
-		return $this->belongsTo(Stop::class)->select(['id', 'code', 'name', 'desc', 'lat', 'lon', 'zone_id', 'url', 'location_type', 'parent_station', 'timezone', 'wheelchair_boarding', 'platform_code', 'created_at', 'updated_at']);
+		return $this->belongsTo(Stop::class)->select(['id', 'agency_id', 'code', 'name', 'desc', 'lat', 'lon', 'zone_id', 'url', 'location_type', 'parent_station', 'timezone', 'wheelchair_boarding', 'platform_code', 'created_at', 'updated_at']);
 	}
 
 	public function trip()

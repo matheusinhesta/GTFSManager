@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\UpdateTripDescriptor;
 use App\Models\TripDescriptor;
 use App\Models\VehiclePosition;
 use Illuminate\Http\Request;
@@ -90,8 +91,8 @@ class DriverController extends Controller {
     public function realtimePosition(Request $request){
         $validator = Validator::make($request->all(), [
             'trip_in_course_id' => 'required|integer|min:0',
-            'latitude'          => 'string|min:0',
-            'longitude'         => 'string|min:0'
+            'lat'               => 'string|min:0',
+            'lon'               => 'string|min:0'
         ]);
 
         if($validator->fails())
@@ -102,15 +103,15 @@ class DriverController extends Controller {
         DB::beginTransaction();
 
         try{
-            $vehicle_position_id = VehiclePosition::create(array_merge($request->all(), [
+            $vehicle_position = VehiclePosition::create(array_merge($request->all(), [
                 'trip_descriptor_id' => $trip->id,
                 'vehicle_id'         => $trip->trip_updates->first()->vehicle_id
             ]));
 
             // dispach função que insere no stop_time_update e atualiza o trip_update
+            UpdateTripDescriptor::dispatch($trip, $vehicle_position);
 
         } catch (\Exception $e){
-            dd($e->getMessage());
             DB::rollBack();
             return response()->json(['message' => "The current location could not be sent!"], 500);
         }

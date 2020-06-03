@@ -17,8 +17,8 @@ class CreateVehiclePositionTable extends Migration
             $table->id();
             $table->unsignedBigInteger('trip_descriptor_id');
             $table->unsignedBigInteger('vehicle_id');
-            $table->float('latitude');
-            $table->float('longitude');
+            $table->double('lat', 10, 8);
+            $table->double('lon', 10, 8);
             $table->float('bearing')->nullable();
             $table->double('odometer', 8,2)->nullable();
             $table->float('speed')->nullable();

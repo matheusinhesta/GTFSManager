@@ -20,8 +20,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $code
  * @property string $name
  * @property string $desc
- * @property string $lat
- * @property string $lon
+ * @property float $lat
+ * @property float $lon
  * @property int $zone_id
  * @property string $url
  * @property string $location_type
@@ -50,7 +50,9 @@ class Stop extends Model
 		'agency_id' => 'int',
 		'zone_id' => 'int',
 		'parent_station' => 'int',
-		'level_id' => 'int'
+		'level_id' => 'int',
+        'lat' => 'float',
+        'lon' => 'float'
 	];
 
 	protected $fillable = [

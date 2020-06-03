@@ -21,7 +21,7 @@ class TripDescriptorController extends Controller {
      */
     public function index() {
         $routes_id = Route::where('agency_id', \Auth::user()->agency_id)->pluck('id');
-        $trips     = TripDescriptor::whereIn('route_id', $routes_id)->whereIn('trip_status', ['scheduled', 'started'])->get();
+        $trips     = TripDescriptor::whereIn('route_id', $routes_id)->get();
         return response()->json(compact('trips'), 200);
     }
 

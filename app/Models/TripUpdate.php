@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class TripUpdate
- * 
+ *
  * @property int $id
  * @property int $trip_descriptor_id
  * @property int $vehicle_id
@@ -21,7 +21,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property string $deleted_at
- * 
+ *
  * @property StopTimeUpdate $stop_time_update
  * @property TripDescriptor $trip_descriptor
  *
@@ -51,7 +51,7 @@ class TripUpdate extends Model
 
 	public function stop_time_update()
 	{
-		return $this->belongsTo(StopTimeUpdate::class);
+		return $this->belongsTo(StopTimeUpdate::class)->select(['id', 'stop_sequence', 'stop_id']);
 	}
 
 	public function trip_descriptor()

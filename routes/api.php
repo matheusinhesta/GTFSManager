@@ -11,6 +11,10 @@ Route::post('register', 'AuthController@register');
 Route::post('login', 'AuthController@login')->name('login');
 Route::post('forget-password', 'AuthController@forgetPassword');
 
+// sem documentação
+Route::get('agency/{agency_id}/next-trips', 'RealtimeTripsController@nextTrips');
+Route::get('agency/{agency_id}/realtime-trip/{trip_descriptor_id}', 'RealtimeTripsController@realtimeTrip');
+
 // Authenticated Routes
 Route::middleware(['jwt.verify'])->group(function () {
 

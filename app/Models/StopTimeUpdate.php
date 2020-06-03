@@ -13,17 +13,17 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class StopTimeUpdate
- * 
+ *
  * @property int $id
  * @property int $stop_sequence
  * @property int $stop_id
- * @property int $arrival
- * @property int $departure
+ * @property int $arrival_time
+ * @property int $departure_time
  * @property int $schedule_id
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property string $deleted_at
- * 
+ *
  * @property Collection|TripUpdate[] $trip_updates
  *
  * @package App\Models
@@ -36,16 +36,16 @@ class StopTimeUpdate extends Model
 	protected $casts = [
 		'stop_sequence' => 'int',
 		'stop_id' => 'int',
-		'arrival' => 'int',
-		'departure' => 'int',
+		'arrival_time' => 'int',
+		'departure_time' => 'int',
 		'schedule_id' => 'int'
 	];
 
 	protected $fillable = [
 		'stop_sequence',
 		'stop_id',
-		'arrival',
-		'departure',
+		'arrival_time',
+		'departure_time',
 		'schedule_id'
 	];
 
@@ -53,4 +53,9 @@ class StopTimeUpdate extends Model
 	{
 		return $this->hasMany(TripUpdate::class);
 	}
+
+    public function stop()
+    {
+        return $this->belongsTo(Stop::class);
+    }
 }

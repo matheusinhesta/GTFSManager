@@ -40,7 +40,7 @@ class GtfsFileController extends Controller {
         $calendar_dates_data = 'service_id,date,exception_type' . PHP_EOL;
 
         foreach($calendar_dates as $calendar)
-            $calendar_dates_data .= $this->clearString($calendar->service_id . ',' . date('Ymd', strtotime($calendar->date)) . ',' . $calendar->enum_key_exception_type+1) . PHP_EOL;
+            $calendar_dates_data .= $this->clearString($calendar->service_id . ',' . date('Ymd', strtotime($calendar->date)) . ',' . (intval($calendar->enum_key_exception_type) + 1)) . PHP_EOL;
 
         Storage::put('Agency_'. $agency_id.'/files/calendar_dates.txt', $calendar_dates_data);
 
@@ -70,17 +70,18 @@ class GtfsFileController extends Controller {
         $rules_data = 'fare_id,route_id,origin_id, destination_id, contains_id' . PHP_EOL;
 
         foreach($rules as $rule)
-            $rules_data .= $this->clearString($rule->fare_id . ',' . $rule->route_id . ',' . $rule->origin_id . ',' . $rule->destination_id . ',' . $rule->contains_id) . PHP_EOL;
+            $rules_data .= $this->clearString($rule->fare_id . ',' . $rule->route_id . ',,,') . PHP_EOL;
 
         Storage::put('Agency_'. $agency_id.'/files/fare_rules.txt', $rules_data);
 
 
         // --------------- Stops
         $stops = Stop::where('agency_id', $agency_id)->get();
-        $stops_data = 'stop_id,stop_name,stop_lon,stop_lat,location_type,parent_station' . PHP_EOL;
+        $stops_data = 'stop_id,stop_name,stop_lon,stop_lat,parent_station' . PHP_EOL;
 
         foreach($stops as $stop)
-            $stops_data .= $this->clearString($stop->id . ',' . $stop->name . ',' . $stop->lon . ',' . $stop->lat . ',' . $stop->enum_key_location_type . ',' . $stop->parent_station) . PHP_EOL;
+            if($stop->location_type != 'station')
+                $stops_data .= $this->clearString($stop->id . ',' . $stop->name . ',' . $stop->lon . ',' . $stop->lat . ',' . $stop->parent_station) . PHP_EOL;
 
         Storage::put('Agency_'. $agency_id.'/files/stops.txt', $stops_data);
 
@@ -90,7 +91,8 @@ class GtfsFileController extends Controller {
         $stop_times_data = 'trip_id,arrival_time,departure_time,stop_id,stop_sequence,timepoint' . PHP_EOL;
 
         foreach($stop_times as $stop_time)
-            $stop_times_data .= $this->clearString($stop_time->trip_id . ',' . $stop_time->arrival_time . ',' . $stop_time->departure_time . ',' . $stop_time->stop_id . ',' . $stop_time->stop_sequence. ',' . (int)$stop_time->timepoint) . PHP_EOL;
+            if($stop_time->stop->location_type != 'station')
+                $stop_times_data .= $this->clearString($stop_time->trip_id . ',' . $stop_time->arrival_time . ',' . $stop_time->departure_time . ',' . $stop_time->stop_id . ',' . $stop_time->stop_sequence. ',' . (int)$stop_time->timepoint) . PHP_EOL;
 
         Storage::put('Agency_'. $agency_id.'/files/stop_times.txt', $stop_times_data);
 

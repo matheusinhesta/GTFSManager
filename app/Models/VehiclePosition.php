@@ -16,8 +16,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property int $id
  * @property int $trip_descriptor_id
  * @property int $vehicle_id
- * @property float $latitude
- * @property float $longitude
+ * @property float $lat
+ * @property float $lon
  * @property float $bearing
  * @property float $odometer
  * @property float $speed
@@ -42,8 +42,8 @@ class VehiclePosition extends Model
 	protected $casts = [
 		'trip_descriptor_id' => 'int',
 		'vehicle_id' => 'int',
-		'latitude' => 'float',
-		'longitude' => 'float',
+		'lat' => 'float',
+		'lon' => 'float',
 		'bearing' => 'float',
 		'odometer' => 'float',
 		'speed' => 'float',
@@ -53,8 +53,8 @@ class VehiclePosition extends Model
 	protected $fillable = [
 		'trip_descriptor_id',
 		'vehicle_id',
-		'latitude',
-		'longitude',
+		'lat',
+		'lon',
 		'bearing',
 		'odometer',
 		'speed',

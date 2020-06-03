@@ -18,8 +18,8 @@ class CreateStopsTable extends Migration
             $table->string('code')->nullable();
             $table->string('name')->nullable();
             $table->string('desc')->nullable();
-            $table->string('lat')->nullable();
-            $table->string('lon')->nullable();
+            $table->double('lat', 10, 8)->nullable();
+            $table->double('lon', 10, 8)->nullable();
             $table->unsignedBigInteger('zone_id');
             $table->string('url')->nullable();
             $table->enum('location_type', ['platform', 'station', 'entrance_exit', 'generic_node', 'boarding_area'])->nullable();

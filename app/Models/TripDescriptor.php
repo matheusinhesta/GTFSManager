@@ -41,6 +41,11 @@ class TripDescriptor extends Model
 	use SoftDeletes;
 	protected $table = 'trip_descriptor';
 
+	protected $appends = [
+	    'current_position',
+        'current_stop'
+    ];
+
 	protected $casts = [
 		'user_id' => 'int',
 		'trip_id' => 'int',
@@ -69,7 +74,7 @@ class TripDescriptor extends Model
 
 	public function user()
 	{
-		return $this->belongsTo(User::class);
+		return $this->belongsTo(User::class)->select(['id', 'name', 'type_id']);
 	}
 
 	public function entity_selectors()
@@ -79,12 +84,12 @@ class TripDescriptor extends Model
 
 	public function trip_updates()
 	{
-		return $this->hasMany(TripUpdate::class);
+		return $this->hasMany(TripUpdate::class)->select(['id', 'trip_descriptor_id', 'vehicle_id', 'stop_time_update_id']);
 	}
 
 	public function vehicle_positions()
 	{
-		return $this->hasMany(VehiclePosition::class);
+		return $this->hasMany(VehiclePosition::class)->select(['id', 'trip_descriptor_id', 'lat', 'lon', 'created_at'])->orderByDesc('id');
 	}
 
     public function route()
@@ -95,6 +100,14 @@ class TripDescriptor extends Model
     public function trip()
     {
         return $this->belongsTo(Trip::class)->select(['id', 'headsign', 'short_name', 'direction_id']);
+    }
+
+    public function getCurrentPositionAttribute(){
+	    return (!empty($this->vehicle_positions->first()) ? $this->vehicle_positions()->select(['lat', 'lon', 'created_at'])->get()->first() : null);
+    }
+
+    public function getCurrentStopAttribute(){
+        return (!empty($this->trip_updates->first()) ? $this->trip_updates->first()->stop_time_update->stop()->get(['id', 'name']) : null);
     }
 
     public function getCreatedAtAttribute($value) {
