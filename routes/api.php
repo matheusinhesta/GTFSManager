@@ -71,6 +71,7 @@ Route::middleware(['jwt.verify'])->group(function () {
 
     });
 
+
     // Driver routes
     Route::prefix('driver')->group(function(){
         Route::get('trips-to-start', 'DriverController@tripsToStart');
