@@ -15,8 +15,8 @@ class RealtimeTripsController extends Controller {
         $routes_id  = Route::where('agency_id', $agency_id)->pluck('id');
         $trips_descriptors = TripDescriptor::with('user', 'user.user_type', 'trip', 'route')
                                     ->whereIn('route_id', $routes_id)->whereIn('trip_status', ['scheduled', 'started', 'canceled'])
-                                    ->whereBetween('start_date', [Carbon::now()->subMinute(5)->format('Y-m-d'), Carbon::now()->addMinutes(15)->format('Y-m-d')])
-                                    ->whereBetween('start_time', [Carbon::now()->subMinute(5)->format('H:i:s'), Carbon::now()->addMinutes(15)->format('H:i:s')])
+                                    ->whereBetween('start_date', [Carbon::now()->subMinute(5)->format('Y-m-d'), Carbon::now()->addMinutes(25)->format('Y-m-d')])
+                                    ->whereBetween('start_time', [Carbon::now()->subMinute(5)->format('H:i:s'), Carbon::now()->addMinutes(25)->format('H:i:s')])
                                     ->orderBy('start_date')->orderBy('start_time')
                                     ->get(['id', 'user_id', 'trip_id', 'route_id', 'trip_status', 'start_date', 'start_time', 'end_date', 'end_time', 'created_at', 'updated_at']);
 
